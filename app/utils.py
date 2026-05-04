@@ -10,7 +10,7 @@ import os
 
 PK = os.getenv("ETH_PK")
 if not PK:
-    raise RuntimeError("ETH_PK fehlt")
+    raise RuntimeError("ETH_PK is missing")
 
 acct = Account.from_key(PK)
 ADDR = acct.address
@@ -45,12 +45,8 @@ def with_prefix(text: str, username) -> str:
     return prefix + text
 
 def normalize_text(text: str) -> str:
-    # Unicode vereinheitlichen
     text = unicodedata.normalize("NFC", text)
-
-    # Zeilenumbrüche vereinheitlichen
     text = text.replace("\r\n", "\n").replace("\r", "\n")
-
     return text
 
 def hash_string(text: str, username) -> str:
@@ -81,7 +77,7 @@ def execute_ts(hash):
     # 1) chainId (Mainnet = 1)
     chain_id = int(rpc_call("eth_chainId", []), 16)
     if chain_id != 1:
-        raise RuntimeError(f"Nicht Mainnet (chainId={chain_id})")
+        raise RuntimeError(f"not Mainnet (chainId={chain_id})")
 
     # 2) nonce (pending)
     nonce = int(rpc_call("eth_getTransactionCount", [ADDR, "pending"]), 16)
