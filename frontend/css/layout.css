@@ -1,0 +1,71 @@
+/* Layout: topbar, rows, view containers, cards */
+
+.topbar{
+  position: sticky;
+  top: 0;
+  background: white;
+  padding: 16px;
+  z-index: 1000;
+  border-bottom: 1px solid #ddd;
+
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+
+  position: sticky;
+}
+
+.leftArea{
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.rightArea{
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-self: end;
+}
+
+.view{
+  padding: 12px;
+}
+
+.btnRow{
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+}
+
+.row{
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.detail-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.card{
+  width: 100%;
+  max-width: 1000px;
+  margin: 12px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-sizing: border-box;
+}
+
+.postBtnRow {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 4px;
+}

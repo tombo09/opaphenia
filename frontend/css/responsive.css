@@ -1,0 +1,53 @@
+/* Responsive overrides */
+
+@media (max-width: 600px) {
+  .loginCard {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .accountCard {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 700px) {
+  .topbar {
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      "left . right"
+      "search search right";
+    align-items: start;
+    gap: 4px 4px;
+    padding: 14px 4px;
+  }
+
+  .leftArea {
+    grid-area: left;
+    justify-self: start;
+  }
+
+  .rightArea {
+    grid-area: right;
+    justify-self: end;
+    align-self: start;
+  }
+
+  .searchBox {
+    grid-area: search;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .searchRow {
+    width: 100%;
+  }
+
+  .searchRow input,
+  .searchBox input {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+}

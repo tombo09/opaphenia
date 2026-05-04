@@ -1,0 +1,317 @@
+/* Page/view specific styling: auth, account, lists, detail, typing */
+
+.public-thought-detail-box {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 18px;
+  background: #fff;
+}
+
+.detail-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.detail-content-box {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 10px;
+  margin: 0px;
+  background: #fafafa;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+.detail-meta {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.detail-meta > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.meta-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.6;
+}
+
+.meta-value {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.typing-cursor {
+  display: inline-block;
+  margin-left: 2px;
+  animation: blink 1s step-end infinite;
+}
+
+.stringItem {
+  border: 1px solid #ddd;
+  padding: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.stringItemContent {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 8;
+  line-clamp: 8;
+  overflow: hidden;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+#stringInput {
+  width: 100%;
+  min-height: 180px;
+  box-sizing: border-box;
+  padding: 10px;
+  resize: none;
+  font-size: 14px;
+}
+
+.detail-content-box {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 2px 6px ;
+  margin: 0;
+  background: #fafafa;
+  line-height: 1.4;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.detail-prefix {
+  color: #999;
+  margin:0;
+}
+
+.detail-body {
+  color: inherit;
+  margin: 0;
+}
+
+#loginView,
+#signupView {
+  position: fixed;
+  top: 80px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.loginCard {
+  width: 100%;
+  max-width: 420px;
+  margin: 0;
+  background: #fafafa;
+  border: 1px solid #eee;
+  border-radius: 16px;
+  padding: 14px;
+  box-sizing: border-box;
+  transform: translateY(-40px);
+}
+
+.accountCard hr {
+  border: 0;
+  border-top: 1px solid #ddd;
+  margin: 16px 0;
+}
+
+.typingWrap {
+  position: relative;
+  width: 100%;
+  min-height: 70vh;
+}
+
+.typingPos1,
+.typingPos2,
+.typingPos3 {
+  position: absolute;
+  margin: 0;
+  display: inline-block;
+  max-width: 85vw;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+.typingPos1 {
+  left: 5%;
+  top: 55%;
+  transform: rotate(-20deg);
+  transform-origin: left bottom;
+}
+
+.typingPos2 {
+  left: 15%;
+  top: 10%;
+  transform: rotate(25deg);
+  transform-origin: left top;
+}
+
+.typingPos3 {
+  left: 50%;
+  bottom: 8%;
+  transform: rotate(-10deg);
+  transform-origin: left bottom;
+}
+
+.stringsListBox {
+  width: 100%;
+  box-sizing: border-box;
+  background: #fafafa;
+  border: 1px solid #eee;
+  border-radius: 16px;
+  padding: 12px;
+}
+
+.ownStringItem,
+.stringItem {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: white;
+  border: 1px solid #ededed;
+  margin-bottom: 8px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.ownStringItem:last-child,
+.stringItem:last-child {
+  margin-bottom: 0;
+}
+
+.stringItemDate {
+  font-size: 14px;
+  opacity: 0.7;
+  margin-bottom: 4px;
+}
+
+.publicStringsHeader {
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.accountCard {
+  width: 100%;
+  max-width: 520px;
+  background: #fafafa;
+  border: 1px solid #eeeeee;
+  border-radius: 16px;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+#accountView {
+  position: fixed;
+  top: 0px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+#saveTimezoneBtn,
+#loginBtn,
+#openSignupBtn,
+#saveEmailBtn,
+#cancelEmailBtn,
+#savePwBtn,
+#saveVisibilityBtn {
+  width: auto;
+  align-self: flex-start;
+  padding: 2px 6px;
+  font-size: 14px;
+  appearance: none;
+  border: 1px solid #dddddd;
+  background: #ffffff;
+  color: #111111;
+  padding: 4px 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+  box-sizing: border-box;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+}
+
+#saveTimezoneBtn:hover,
+#loginBtn:hover,
+#openSignupBtn:hover,
+#saveEmailBtn:hover,
+#cancelEmailBtn:hover,
+#savePwBtn:hover,
+#saveVisibilityBtn:hover {
+  background: #f5f5f5;
+  border-color: #cfcfcf;
+}
+
+.accountCard h3,
+.accountCard h4 {
+  margin-bottom: 6px;
+}
+
+#saveTimezoneBtn:active,
+#copyLinkBtn:active,
+#loginBtn:active,
+#openSignupBtn:active,
+#saveEmailBtn:active,
+#cancelEmailBtn:active,
+#savePwBtn:active,
+#saveVisibilityBtn:active {
+  background: #cfcfcf;
+}
+
+#accountTimezone {
+  width: 100%;
+  max-width: 260px;
+  padding: 6px 8px;
+  border: 1px solid #dddddd;
+  border-radius: 8px;
+  background: #ffffff;
+  font: inherit;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+.accountSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 0px;
+}

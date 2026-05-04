@@ -1,0 +1,296 @@
+/* Reusable components: search, buttons, modals, toasts, animations */
+
+.searchBox{
+  position: relative;
+}
+
+.searchRow{
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+#searchAccInput {
+  width: 100%;
+  border: 1px solid #cccccc;
+  border-radius: 16px;
+  padding: 4px 10px;
+  background: #fff;
+  color: #111;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.searchDropdown{
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 220px;
+  width: 100%;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  z-index: 2000;
+  display: none;
+  overflow: hidden;
+}
+
+.searchDropdown .accItem{
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  background: white;
+  text-align: left;
+  cursor: pointer;
+  margin: 0;
+}
+
+.searchDropdown .accItem:hover{
+  background: #f5f5f5;
+}
+
+.modalOverlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.modalCard{
+  position: relative;
+  width: min(580px, calc(100vw - 32px));
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+  box-sizing: border-box;
+}
+
+.modalCloseBtn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 18px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+#settingsBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.proofHashCodeBox {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #f7f7f7;
+  font-family: monospace;
+  font-size: 13px;
+  line-height: 1.45;
+  white-space: pre;
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
+.msgToast {
+  position: fixed;
+  top: 72px;
+  right: 16px;
+  z-index: 5000;
+
+  max-width: min(90vw, 360px);
+  padding: 10px 14px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-6px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.msgToast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.btn {
+  appearance: none;
+  border: 1px solid #dddddd;
+  background: #f3f3f3;
+  color: #111111;
+  padding: 4px 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+  box-sizing: border-box;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+}
+
+.btn:hover {
+  background: #f7f7f7;
+  border-color: #cfcfcf;
+}
+
+.btn:active {
+  background: #efefef;
+}
+
+.btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.btnPost {
+  background: #111;
+  color: white;
+  border: 1px solid #111;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-family: system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.btnPost:hover {
+  background: #222;
+  border-color: #222;
+}
+
+.btnPost:active {
+  background: #333;
+  border-color: #333;
+}
+
+.btnPost {
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.2s ease;
+}
+
+.btnPost:hover {
+  transform: translateY(-1px);
+}
+
+.btnPost:disabled {
+  cursor: not-allowed;
+  opacity: 0.95;
+}
+
+.btnPost .btnLabel {
+  display: inline-block;
+  transition: opacity 0.2s ease;
+}
+
+/* gemeinsame Ebene für Spinner / Icons */
+.btnPost::after,
+.btnPost::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Spinner */
+.btnPost::after {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-right-color: white;
+  border-top-color: white;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Label ausblenden sobald ein Status aktiv ist */
+.btnPost.loading .btnLabel,
+.btnPost.success .btnLabel,
+.btnPost.error .btnLabel {
+  opacity: 0;
+}
+
+/* Loading */
+.btnPost.loading::after {
+  opacity: 1;
+  animation: btn-spin 0.7s linear infinite;
+}
+
+/* Success: Haken */
+.btnPost.success::before {
+  width: 8px;
+  height: 14px;
+  border-right: 2px solid white;
+  border-bottom: 2px solid white;
+  transform: translate(-50%, -58%) rotate(45deg) scale(1);
+  opacity: 1;
+  animation: icon-pop 0.22s ease;
+}
+
+/* Error: X */
+.btnPost.error::before,
+.btnPost.error::after {
+  width: 14px;
+  height: 2px;
+  background: white;
+  border: none;
+  border-radius: 999px;
+  opacity: 1;
+  animation: icon-pop 0.22s ease;
+}
+
+.btnPost.error::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.btnPost.error::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+@keyframes btn-spin {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes icon-pop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.7);
+  }
+  100% {
+    opacity: 1;
+  }
+}

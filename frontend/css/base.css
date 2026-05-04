@@ -1,0 +1,38 @@
+/* Global defaults: typography, links, form basics */
+
+a {
+  color: #222;
+  text-decoration: none;
+}
+
+a:visited {
+  color: #222;
+}
+
+a:hover {
+  color: #555;
+}
+
+a:active {
+  color: #999;
+}
+
+input {
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  padding: 4px 8px;
+  box-sizing: border-box;
+}
+
+input,
+textarea,
+button,
+body {
+  font-family: Inter, Arial, sans-serif;
+}
+
+input,
+textarea,
+button {
+  font-size: 14px;
+}
