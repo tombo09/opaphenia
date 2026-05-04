@@ -6,8 +6,12 @@ from pathlib import Path
 import hashlib
 import unicodedata
 from eth_account import Account
+import os
 
-PK = open("/home/tom/.eth_pk").read().strip()
+PK = os.getenv("ETH_PK")
+if not s:
+    raise RuntimeError("ETH_PK fehlt")
+
 acct = Account.from_key(PK)
 ADDR = acct.address
 
