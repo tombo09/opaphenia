@@ -42,6 +42,7 @@ function initGlobalEvents() {
     history.pushState({}, "", "/");
 
     if (await isLoggedIn()) {
+      const ok = await loadAccount();
       showOnly(overviewView);
       await refreshStringsList();
     } else {
