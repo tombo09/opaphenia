@@ -9,7 +9,7 @@ from eth_account import Account
 import os
 
 PK = os.getenv("ETH_PK")
-if not s:
+if not PK:
     raise RuntimeError("ETH_PK fehlt")
 
 acct = Account.from_key(PK)
