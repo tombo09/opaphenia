@@ -29,6 +29,10 @@ def create_app() -> FastAPI:
     app.include_router(thoughts.router, prefix="/api")
     app.include_router(public.router, prefix="/api")
 
+    app.mount("/js", StaticFiles(directory="frontend/js"), name="js")
+
+    app.mount("/css", StaticFiles(directory="frontend/css"), name="css")
+
     @app.get("/{username}/{thought_id}")
     def public_string_page(username: str, thought_id: int):
         return FileResponse("frontend/index.html")
