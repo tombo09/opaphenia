@@ -1,0 +1,781 @@
+.topbar{
+  position: sticky;
+  top: 0;
+  background: white;
+  padding: 16px;
+  z-index: 1000;
+  border-bottom: 1px solid #ddd;
+
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+
+  position: sticky;
+}
+
+.leftArea{
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.rightArea{
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-self: end;
+}
+
+
+
+
+
+
+.view{
+  padding: 12px;
+}
+
+
+
+.btnRow{
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+}
+
+.row{
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.searchBox{
+  position: relative;
+}
+
+.searchRow{
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+#searchAccInput {
+  width: 100%;
+  border: 1px solid #cccccc;
+  border-radius: 16px;
+  padding: 4px 10px;
+  background: #fff;
+  color: #111;
+  box-sizing: border-box;
+  outline: none;
+}
+
+
+.searchDropdown{
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 220px;
+  width: 100%;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  z-index: 2000;
+  display: none;
+  overflow: hidden;
+}
+
+.searchDropdown .accItem{
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  background: white;
+  text-align: left;
+  cursor: pointer;
+  margin: 0;
+}
+
+.searchDropdown .accItem:hover{
+  background: #f5f5f5;
+}
+.modalOverlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.modalCard{
+  position: relative;
+  width: min(580px, calc(100vw - 32px));
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+  box-sizing: border-box;
+}
+
+.modalCloseBtn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 18px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+
+
+.public-thought-detail-box {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 18px;
+  background: #fff;
+}
+
+.detail-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.detail-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.detail-content-box {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 10px;
+  margin: 0px;
+  background: #fafafa;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+
+
+.detail-meta {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.detail-meta > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.meta-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.6;
+}
+
+.meta-value {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.typing-cursor {
+  display: inline-block;
+  margin-left: 2px;
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+#settingsBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.stringItem {
+  border: 1px solid #ddd;
+  padding: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.stringItemContent {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 8;
+  line-clamp: 8;
+  overflow: hidden;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+#stringInput {
+  width: 100%;
+  min-height: 180px;
+  box-sizing: border-box;
+  padding: 10px;
+  resize: none;
+  font-size: 14px;
+}
+
+.detail-content-box {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 2px 6px ;
+  margin: 0;
+  background: #fafafa;
+  line-height: 1.4;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.detail-prefix {
+  color: #999;
+  margin:0;
+}
+
+.detail-body {
+  color: inherit;
+  margin: 0;
+}
+
+.proofHashCodeBox {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #f7f7f7;
+  font-family: monospace;
+  font-size: 13px;
+  line-height: 1.45;
+  white-space: pre;
+  overflow-x: auto;
+  overflow-y: auto;
+}
+.card{
+  width: 100%;
+  max-width: 1000px;
+  margin: 12px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-sizing: border-box;
+}
+#loginView,
+#signupView {
+  position: fixed;
+  top: 80px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.loginCard {
+  width: 100%;
+  max-width: 420px;
+  margin: 0;
+  background: #fafafa;
+  border: 1px solid #eee;
+  border-radius: 16px;
+  padding: 14px;
+  box-sizing: border-box;
+  transform: translateY(-40px);
+}
+
+
+@media (max-width: 600px) {
+  .loginCard {
+    max-width: 100%;
+  }
+}
+
+
+@media (max-width: 600px) {
+  .accountCard {
+    max-width: 100%;
+  }
+}
+
+.accountCard hr {
+  border: 0;
+  border-top: 1px solid #ddd;
+  margin: 16px 0;
+}
+
+
+@media (max-width: 700px) {
+  .topbar {
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      "left . right"
+      "search search right";
+    align-items: start;
+    gap: 4px 4px;
+    padding: 14px 4px;
+  }
+
+  .leftArea {
+    grid-area: left;
+    justify-self: start;
+  }
+
+  .rightArea {
+    grid-area: right;
+    justify-self: end;
+    align-self: start;
+  }
+
+  .searchBox {
+    grid-area: search;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .searchRow {
+    width: 100%;
+  }
+
+  .searchRow input,
+  .searchBox input {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+}
+
+.msgToast {
+  position: fixed;
+  top: 72px;
+  right: 16px;
+  z-index: 5000;
+
+  max-width: min(90vw, 360px);
+  padding: 10px 14px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-6px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.msgToast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.typingWrap {
+  position: relative;
+  width: 100%;
+  min-height: 70vh;
+}
+
+.typingPos1,
+.typingPos2,
+.typingPos3 {
+  position: absolute;
+  margin: 0;
+  display: inline-block;
+  max-width: 85vw;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+.typingPos1 {
+  left: 5%;
+  top: 55%;
+  transform: rotate(-20deg);
+  transform-origin: left bottom;
+}
+
+.typingPos2 {
+  left: 15%;
+  top: 10%;
+  transform: rotate(25deg);
+  transform-origin: left top;
+}
+
+.typingPos3 {
+  left: 50%;
+  bottom: 8%;
+  transform: rotate(-10deg);
+  transform-origin: left bottom;
+}
+
+
+.stringsListBox {
+  width: 100%;
+  box-sizing: border-box;
+  background: #fafafa;
+  border: 1px solid #eee;
+  border-radius: 16px;
+  padding: 12px;
+}
+.ownStringItem,
+.stringItem {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: white;
+  border: 1px solid #ededed;
+  margin-bottom: 8px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.ownStringItem:last-child,
+.stringItem:last-child {
+  margin-bottom: 0;
+}
+
+.stringItemDate {
+  font-size: 14px;
+  opacity: 0.7;
+  margin-bottom: 4px;
+}
+
+.publicStringsHeader {
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+a {
+  color: #222;
+  text-decoration: none;
+}
+
+a:visited {
+  color: #222;
+}
+
+a:hover {
+  color: #555;
+}
+
+a:active {
+  color: #999;
+}
+
+.btn {
+  appearance: none;
+  border: 1px solid #dddddd;
+  background: #f3f3f3;
+  color: #111111;
+  padding: 4px 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+  box-sizing: border-box;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+}
+
+.btn:hover {
+  background: #f7f7f7;
+  border-color: #cfcfcf;
+}
+
+.btn:active {
+  background: #efefef;
+}
+
+.btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.postBtnRow {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.btnPost {
+  background: #111;
+  color: white;
+  border: 1px solid #111;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-family: system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.btnPost:hover {
+  background: #222;
+  border-color: #222;
+}
+
+.btnPost:active {
+  background: #333;
+  border-color: #333;
+}
+
+.accountCard {
+  width: 100%;
+  max-width: 520px;
+  background: #fafafa;
+  border: 1px solid #eeeeee;
+  border-radius: 16px;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+#accountView {
+  position: fixed;
+  top: 0px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+#saveTimezoneBtn,
+#loginBtn,
+#openSignupBtn,
+#saveEmailBtn,
+#cancelEmailBtn,
+#savePwBtn,
+#saveVisibilityBtn {
+  width: auto;
+  align-self: flex-start;
+  padding: 2px 6px;
+  font-size: 14px;
+  appearance: none;
+  border: 1px solid #dddddd;
+  background: #ffffff;
+  color: #111111;
+  padding: 4px 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+  box-sizing: border-box;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+}
+
+#saveTimezoneBtn:hover,
+#loginBtn:hover,
+#openSignupBtn:hover,
+#saveEmailBtn:hover,
+#cancelEmailBtn:hover,
+#savePwBtn:hover,
+#saveVisibilityBtn:hover {
+  background: #f5f5f5;
+  border-color: #cfcfcf;
+}
+
+
+.accountCard h3,
+.accountCard h4 {
+  margin-bottom: 6px;
+}
+
+input {
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  padding: 4px 8px;
+  box-sizing: border-box;
+}
+
+#saveTimezoneBtn:active,
+#copyLinkBtn:active,
+#loginBtn:active,
+#openSignupBtn:active,
+#saveEmailBtn:active,
+#cancelEmailBtn:active,
+#savePwBtn:active,
+#saveVisibilityBtn:active {
+  background: #cfcfcf;
+}
+
+
+input,
+textarea,
+button,
+body {
+  font-family: Inter, Arial, sans-serif;
+}
+input,
+textarea,
+button {
+  font-size: 14px;
+}
+
+#accountTimezone {
+  width: 100%;
+  max-width: 260px;
+  padding: 6px 8px;
+  border: 1px solid #dddddd;
+  border-radius: 8px;
+  background: #ffffff;
+  font: inherit;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+.accountSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 0px;
+}
+
+
+.btnPost {
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.2s ease;
+}
+
+.btnPost:hover {
+  transform: translateY(-1px);
+}
+
+.btnPost:disabled {
+  cursor: not-allowed;
+  opacity: 0.95;
+}
+
+.btnPost .btnLabel {
+  display: inline-block;
+  transition: opacity 0.2s ease;
+}
+
+/* gemeinsame Ebene für Spinner / Icons */
+.btnPost::after,
+.btnPost::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Spinner */
+.btnPost::after {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-right-color: white;
+  border-top-color: white;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Label ausblenden sobald ein Status aktiv ist */
+.btnPost.loading .btnLabel,
+.btnPost.success .btnLabel,
+.btnPost.error .btnLabel {
+  opacity: 0;
+}
+
+/* Loading */
+.btnPost.loading::after {
+  opacity: 1;
+  animation: btn-spin 0.7s linear infinite;
+}
+
+/* Success: Haken */
+.btnPost.success::before {
+  width: 8px;
+  height: 14px;
+  border-right: 2px solid white;
+  border-bottom: 2px solid white;
+  transform: translate(-50%, -58%) rotate(45deg) scale(1);
+  opacity: 1;
+  animation: icon-pop 0.22s ease;
+}
+
+/* Error: X */
+.btnPost.error::before,
+.btnPost.error::after {
+  width: 14px;
+  height: 2px;
+  background: white;
+  border: none;
+  border-radius: 999px;
+  opacity: 1;
+  animation: icon-pop 0.22s ease;
+}
+
+.btnPost.error::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.btnPost.error::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+@keyframes btn-spin {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes icon-pop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.7);
+  }
+  100% {
+    opacity: 1;
+  }
+}
