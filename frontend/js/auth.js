@@ -65,18 +65,18 @@ export function initAuthEvents() {
       lockLoginUI(false);
       loginInput.value = "";
       loginPasswordInput.value = "";
-      showMsg("Eingeloggt.", 2000);
+      showMsg("Logged in.", 2000);
       window.location.href = "/";
     } catch (err) {
       state.failedLocal += 1;
 
       if (err.status === 423) {
         lockLoginUI(true);
-        showMsg(err.message || "Zu viele Fehlversuche. Reset nötig.", 5000);
+        showMsg(err.message || "Too many failed attempts. Reset required.", 5000);
         return;
       }
 
-      showMsg(err.message || "Login fehlgeschlagen", 3000);
+      showMsg(err.message || "Login failed", 3000);
       if (state.failedLocal >= 5 && resetPwBtn) resetPwBtn.style.display = "inline-block";
     }
   });
@@ -85,7 +85,7 @@ export function initAuthEvents() {
     const email = loginInput.value.trim();
 
     if (!email) {
-      showMsg("Bitte Email eingeben.", 3000);
+      showMsg("Please enter your email address.", 3000);
       return;
     }
 
@@ -95,7 +95,7 @@ export function initAuthEvents() {
       body: JSON.stringify({ email }),
     });
 
-    showMsg("Wenn ein Reset möglich ist, wurde eine Email gesendet.", 5000);
+    showMsg("If a reset is possible, an email has been sent.", 5000);
   });
 
   signupBtn?.addEventListener("click", async () => {
@@ -109,20 +109,20 @@ export function initAuthEvents() {
         body: JSON.stringify({ email, username, password }),
       });
 
-      showMsg(data.message || "Bitte Email verifizieren.", 5000);
+      showMsg(data.message || "Please verify your email address.", 5000);
       showOnly(loginView);
     } catch (err) {
       if (err.status === 409) {
-        showMsg(err.message || "Email oder Username ist bereits vergeben.", 3000);
+        showMsg(err.message || "This email address or username is already taken.", 3000);
       } else {
-        showMsg(err.message || "Fehler beim Erstellen.", 3000);
+        showMsg(err.message || "Error during creation.", 3000);
       }
     }
   });
 
   logoutBtn?.addEventListener("click", async () => {
     await apiRaw("/api/logout", { method: "POST", credentials: "include" });
-    showMsg("Ausgeloggt.", 3000);
+    showMsg("Logged out.", 3000);
     await refreshAuthUI();
     window.location.href = "/";
   });

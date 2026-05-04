@@ -170,5 +170,5 @@ initPublicEvents();
 
 initApp().catch((err) => {
   console.error(err);
-  showMsg("App konnte nicht geladen werden.", 3000);
+  showMsg("The app could not be loaded.", 3000);
 });

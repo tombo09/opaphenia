@@ -137,7 +137,7 @@ export async function loadPublicThoughtDetail(username, thoughtId) {
   const backHref = from === "overview" ? "/?view=overview" : `/${encodeURIComponent(username)}`;
 
   if (!res.ok) {
-    renderDetailError(data.detail || "String konnte nicht geladen werden.");
+    renderDetailError(data.detail || "The string could not be loaded.");
     return;
   }
 

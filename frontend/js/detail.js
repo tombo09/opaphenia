@@ -41,7 +41,7 @@ export function renderThoughtDetail(data, username, backHref) {
 export function renderDetailError(message) {
   publicStringsList.innerHTML = `
     <div class="card">
-      <p>Fehler: ${escapeHtml(message || "String konnte nicht geladen werden.")}</p>
+      <p>Fehler: ${escapeHtml(message || "The string could not be loaded.")}</p>
     </div>
   `;
 }

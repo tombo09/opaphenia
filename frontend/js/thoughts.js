@@ -22,7 +22,7 @@ export function initThoughtEvents() {
 
     const username = state.currentUsername;
     if (!username) {
-      showMsg("Username konnte nicht geladen werden.", 3000);
+      showMsg("The username could not be loaded.", 3000);
       return;
     }
 
@@ -55,7 +55,7 @@ export async function refreshStringsList() {
           .join("")}
       </div>
     `
-    : "<p>Noch keine Einträge.</p>";
+    : "<p>No entries yet</p>";
 }
 
 async function saveThought(e) {
@@ -66,12 +66,12 @@ async function saveThought(e) {
   const content = normalizeText(stringInput.value);
 
   if (!content) {
-    showMsg("Bitte einen String eingeben.", 3000);
+    showMsg("Please enter a string.", 3000);
     return;
   }
 
   if (content.length > MAX_STRING_LENGTH) {
-    showMsg(`Maximal ${MAX_STRING_LENGTH} Zeichen erlaubt.`, 3000);
+    showMsg(`A maximum of ${MAX_STRING_LENGTH} characters are allowed.`, 3000);
     return;
   }
 
@@ -86,7 +86,7 @@ async function saveThought(e) {
     });
 
     setSaveBtnState("success");
-    showMsg(`Gespeichert: "${content}"`, 3000);
+    showMsg(`saved!`, 3000);
     stringInput.value = "";
     updateStringCounter();
     await refreshStringsList();
@@ -94,7 +94,7 @@ async function saveThought(e) {
     setTimeout(() => closePostModal(), 900);
   } catch (err) {
     setSaveBtnState("error");
-    showMsg(err.message || "Fehler beim Speichern.", 3000);
+    showMsg(err.message || "Error saving.", 3000);
     setTimeout(() => resetSaveButton(), 900);
   }
 }

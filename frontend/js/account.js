@@ -31,7 +31,7 @@ export async function loadAccount() {
 
     return true;
   } catch (err) {
-    showMsg(err.message || "Account konnte nicht geladen werden.", 3000);
+    showMsg(err.message || "The account could not be loaded.", 3000);
     return false;
   }
 }
@@ -63,9 +63,9 @@ export function initAccountEvents() {
       });
 
       setEmailEditMode(false);
-      showMsg("Bestätigungslink wurde an die neue Email gesendet. Bitte verifizieren.", 5000);
+      showMsg("A confirmation link has been sent to your new email address. Please verify it.", 5000);
     } catch (err) {
-      showMsg(err.status === 409 ? "Email existiert bereits." : err.message || "Email konnte nicht geändert werden.", 3000);
+      showMsg(err.status === 409 ? "This email address already exists" : err.message || "The email address could not be changed.", 3000);
     }
   });
 
@@ -76,9 +76,9 @@ export function initAccountEvents() {
         body: JSON.stringify({ strings_public: publicStringsChk.checked }),
       });
 
-      showMsg(data.strings_public ? "Strings sind jetzt public." : "Strings sind jetzt private.", 3000);
+      showMsg(data.strings_public ? "Strings are now public." : "Strings are now private.", 3000);
     } catch (err) {
-      showMsg(err.message || "Konnte nicht speichern.", 3000);
+      showMsg(err.message || "Unable to save.", 3000);
     }
   });
 
@@ -98,9 +98,9 @@ export function initAccountEvents() {
       oldPw.value = "";
       newPw.value = "";
       newPw2.value = "";
-      showMsg("Passwort geändert.", 3000);
+      showMsg("Password changed.", 3000);
     } catch (err) {
-      showMsg(err.message || "Passwort konnte nicht geändert werden.", 3000);
+      showMsg(err.message || "The password could not be changed.", 3000);
     }
   });
 
@@ -114,9 +114,9 @@ export function initAccountEvents() {
       });
 
       state.currentTimezone = timezone;
-      showMsg("Timezone gespeichert.", 2000);
+      showMsg("Time zone saved", 2000);
     } catch (err) {
-      showMsg(err.message || "Timezone konnte nicht gespeichert werden.", 3000);
+      showMsg(err.message || "The time zone could not be saved", 3000);
     }
   });
 }
