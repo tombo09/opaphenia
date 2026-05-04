@@ -14,19 +14,19 @@ MAX_THOUGHTS_PER_DAY = 80
 def create_thought(payload: ThoughtIn, user_id: int = Depends(get_current_user_id)):
     content = payload.content.strip()
     if not content:
-        raise HTTPException(status_code=400, detail="Text ist leer")
+        raise HTTPException(status_code=400, detail="The text is empty")
 
     if len(content) > MAX_THOUGHT_LENGTH:
         raise HTTPException(
             status_code=400,
-            detail=f"Text darf maximal {MAX_THOUGHT_LENGTH} Zeichen haben"
+            detail=f"The text must not exceed {MAX_THOUGHT_LENGTH} characters"
         )
     
     moderation = moderate_text(content)
     if moderation["flagged"]:
         raise HTTPException(
             status_code=400,
-            detail="Dieser Text konnte nicht gespeichert werden."
+            detail="This text could not be saved."
         )
 
     con = connect()
@@ -35,7 +35,7 @@ def create_thought(payload: ThoughtIn, user_id: int = Depends(get_current_user_i
             cur.execute("SELECT username FROM users WHERE id = %s", (user_id,))
             row = cur.fetchone()
             if not row:
-                raise HTTPException(status_code=404, detail="User nicht gefunden")
+                raise HTTPException(status_code=404, detail="User not found")
 
             cur.execute(
                 """
@@ -52,7 +52,7 @@ def create_thought(payload: ThoughtIn, user_id: int = Depends(get_current_user_i
             if count_today >= MAX_THOUGHTS_PER_DAY:
                 raise HTTPException(
                     status_code=429,
-                    detail=f"Maximal {MAX_THOUGHTS_PER_DAY} Strings pro Tag erlaubt"
+                    detail=f"A maximum of {MAX_THOUGHTS_PER_DAY} strings are allowed per day"
                 )
 
             username = row["username"]

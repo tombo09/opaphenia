@@ -23,7 +23,7 @@ def get_account(user_id: int = Depends(get_current_user_id)):
     con.close()
 
     if not row:
-        raise HTTPException(status_code=404, detail="User nicht gefunden")
+        raise HTTPException(status_code=404, detail="User not found")
 
     return {
         "ok": True,
@@ -43,7 +43,7 @@ def request_email_change(payload: EmailUpdateIn, user_id: int = Depends(get_curr
     cur.execute("SELECT 1 FROM users WHERE email = %s", (new_email,))
     if cur.fetchone():
         con.close()
-        raise HTTPException(status_code=409, detail="Email existiert bereits")
+        raise HTTPException(status_code=409, detail="This email address already exists")
     con.close()
 
     token = secrets.token_urlsafe(32)
@@ -62,14 +62,14 @@ def request_email_change(payload: EmailUpdateIn, user_id: int = Depends(get_curr
     link = f"{APP_BASE_URL}/api/verify-email?token={token}"
     send_email(new_email, "Confirm your new email", f"Click to confirm: {link}")
 
-    return {"ok": True, "message": "Bestätigungslink wurde an die neue Email gesendet."}
+    return {"ok": True, "message": "A confirmation link has been sent to your new email address."}
 
 @router.put("/account/password")
 def update_password(payload: PasswordUpdate, user_id: int = Depends(get_current_user_id)):
     if payload.new_password != payload.new_password2:
-        raise HTTPException(status_code=400, detail="Neue Passwörter stimmen nicht überein")
+        raise HTTPException(status_code=400, detail="New passwords do not match")
     if len(payload.new_password) < 8:
-        raise HTTPException(status_code=400, detail="Neues Passwort zu kurz (min. 8 Zeichen)")
+        raise HTTPException(status_code=400, detail="New password is too short (min. 8 characters)")
 
     con = connect()
     cur = con.cursor()
@@ -77,12 +77,12 @@ def update_password(payload: PasswordUpdate, user_id: int = Depends(get_current_
     row = cur.fetchone()
     if not row:
         con.close()
-        raise HTTPException(status_code=404, detail="User nicht gefunden")
+        raise HTTPException(status_code=404, detail="User not found")
 
     pw_hash = row[0]
     if not verify_password(payload.old_password, pw_hash):
         con.close()
-        raise HTTPException(status_code=401, detail="Altes Passwort ist falsch")
+        raise HTTPException(status_code=401, detail="The old password is incorrect")
 
     new_hash = hash_password(payload.new_password)
     cur.execute("UPDATE users SET password_hash = %s WHERE id = %s", (new_hash, user_id))
@@ -105,7 +105,7 @@ def save_account_timezone(payload: TimezoneIn, user_id: int = Depends(get_curren
     timezone = (payload.timezone or "").strip()
 
     if not timezone:
-        raise HTTPException(status_code=400, detail="Timezone fehlt")
+        raise HTTPException(status_code=400, detail="Time zone missing")
 
     con = connect()
     try:

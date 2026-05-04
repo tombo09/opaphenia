@@ -47,10 +47,10 @@ def public_thoughts_by_user(user_id: int):
             row = cur.fetchone()
 
             if not row:
-                raise HTTPException(status_code=404, detail="User nicht gefunden")
+                raise HTTPException(status_code=404, detail="User not found")
 
             if row["strings_public"] is not True:
-                raise HTTPException(status_code=403, detail="Dieser Account ist privat")
+                raise HTTPException(status_code=403, detail="This account is private")
 
             cur.execute(
                 """
@@ -108,7 +108,7 @@ def get_public_thought(thought_id: int):
             raise HTTPException(status_code=404, detail="String not found")
 
         if row["strings_public"] is not True:
-            raise HTTPException(status_code=403, detail="Dieser String ist nicht öffentlich")
+            raise HTTPException(status_code=403, detail="This string is not public")
 
         link = etherscan_link(row["txid"]) if row["txid"] else None
 
@@ -148,10 +148,10 @@ def public_user_by_username(username: str):
             user = cur.fetchone()
 
             if not user:
-                raise HTTPException(status_code=404, detail="User nicht gefunden")
+                raise HTTPException(status_code=404, detail="User not found")
 
             if user["strings_public"] is not True:
-                raise HTTPException(status_code=403, detail="Dieser Account ist privat")
+                raise HTTPException(status_code=403, detail="This account is private")
 
             cur.execute(
                 """
@@ -215,7 +215,7 @@ def public_thought_by_username(username: str, thought_id: int):
             raise HTTPException(status_code=404, detail="String not found")
 
         if row["strings_public"] is not True:
-            raise HTTPException(status_code=403, detail="Dieser Account ist privat")
+            raise HTTPException(status_code=403, detail="This account is private")
 
         link = etherscan_link(row["txid"]) if row["txid"] else None
 
@@ -258,7 +258,7 @@ def get_own_thought(thought_id: int, user_id: int = Depends(get_current_user_id)
             row = cur.fetchone()
 
         if not row:
-            raise HTTPException(status_code=404, detail="String nicht gefunden")
+            raise HTTPException(status_code=404, detail="String not found")
 
         link = etherscan_link(row["txid"]) if row["txid"] else None
 

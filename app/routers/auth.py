@@ -42,7 +42,7 @@ def signup(payload: SignupIn):
     username = payload.username.strip()
 
     if not username:
-        raise HTTPException(status_code=400, detail="Username ist erforderlich")
+        raise HTTPException(status_code=400, detail="A username is required")
 
     pw_hash = hash_password(payload.password)
 
@@ -62,7 +62,7 @@ def signup(payload: SignupIn):
     except Exception:
         raise HTTPException(
             status_code=409,
-            detail="Email oder Username existiert bereits",
+            detail="The email address or username already exists",
         )
     finally:
         con.close()
@@ -89,7 +89,7 @@ def signup(payload: SignupIn):
     link = f"{APP_BASE_URL}/api/verify-email?token={token}"
     send_email(email, "Verify your email", f"Click to verify: {link}")
 
-    return {"ok": True, "message": "Bitte Email prüfen und verifizieren."}
+    return {"ok": True, "message": "Please check and verify your email address."}
 
 
 @router.get("/verify-email", response_class=HTMLResponse)
@@ -120,10 +120,10 @@ def verify_email(token: str):
             used = row["used"]
 
             if used is True:
-                return "<h3>Link wurde bereits verwendet.</h3>"
+                return "<h3><This link has already been used./h3>"
 
             if now_utc() > expires_at:
-                return "<h3>Link ist abgelaufen.</h3>"
+                return "<h3><The link has expired./h3>"
 
             if purpose == "signup":
                 cur.execute(
@@ -142,7 +142,7 @@ def verify_email(token: str):
             )
             con.commit()
 
-        return "<h3>Email erfolgreich verifiziert.</h3>"
+        return "<h3><Email successfully verified./h3>"
     finally:
         con.close()
 
@@ -166,7 +166,7 @@ def login(data: LoginIn, response: Response):
             row = cur.fetchone()
 
             if not row:
-                raise HTTPException(status_code=401, detail="Falsche Zugangsdaten")
+                raise HTTPException(status_code=401, detail="Incorrect login details")
 
             user_id = row["id"]
             pw_hash = row["password_hash"]
@@ -176,7 +176,7 @@ def login(data: LoginIn, response: Response):
             if email_verified is not True:
                 raise HTTPException(
                     status_code=403,
-                    detail="Bitte Email zuerst verifizieren",
+                    detail="Please verify your email address first",
                 )
 
             if not verify_password(data.password, pw_hash):
@@ -190,10 +190,10 @@ def login(data: LoginIn, response: Response):
                 if failed_attempts >= 5:
                     raise HTTPException(
                         status_code=423,
-                        detail="Zu viele Fehlversuche. Bitte Passwort zurücksetzen.",
+                        detail="Too many failed attempts. Please reset your password.",
                     )
 
-                raise HTTPException(status_code=401, detail="Falsche Zugangsdaten")
+                raise HTTPException(status_code=401, detail="Incorrect login details")
 
             cur.execute(
                 "UPDATE users SET failed_attempts = 0 WHERE id = %s",
@@ -280,9 +280,9 @@ def password_reset_confirm(
     new_password2: str = Form(...),
 ):
     if new_password != new_password2:
-        return "<h3>Passwörter stimmen nicht überein.</h3>"
+        return "<h3><The passwords do not match./h3>"
     if len(new_password) < 8:
-        return "<h3>Passwort zu kurz (min. 8 Zeichen).</h3>"
+        return "<h3><Password too short (min. 8 characters)./h3>"
 
     token_hash = sha256(token)
 
@@ -300,7 +300,7 @@ def password_reset_confirm(
             row = cur.fetchone()
 
             if not row:
-                return "<h3>Ungültiger Token.</h3>"
+                return "<h3><Invalid token./h3>"
 
             reset_id = row["id"]
             user_id = row["user_id"]
@@ -308,10 +308,10 @@ def password_reset_confirm(
             used = row["used"]
 
             if used is True:
-                return "<h3>Link wurde bereits verwendet.</h3>"
+                return "<h3><This link has already been used./h3>"
 
             if now_utc() > expires_at:
-                return "<h3>Link ist abgelaufen.</h3>"
+                return "<h3><The link has expired./h3>"
 
             new_hash = hash_password(new_password)
 
@@ -325,6 +325,6 @@ def password_reset_confirm(
             )
             con.commit()
 
-        return "<h3>Passwort geändert. Du kannst dich jetzt einloggen.</h3>"
+        return "<h3><Your password has been changed. You can now log in./h3>"
     finally:
         con.close()
