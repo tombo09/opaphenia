@@ -120,3 +120,45 @@ export function initAccountEvents() {
     }
   });
 }
+
+
+const exportStringsBtn = document.getElementById("exportStringsBtn");
+
+if (exportStringsBtn) {
+  exportStringsBtn.addEventListener("click", async () => {
+    try {
+      exportStringsBtn.disabled = true;
+      exportStringsBtn.textContent = "Exporting...";
+
+      const res = await fetch("/api/account/export", {
+        method: "GET",
+        credentials: "include"
+      });
+
+      if (!res.ok) {
+        throw new Error("Export failed");
+      }
+
+      const blob = await res.blob();
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+
+      a.href = url;
+      a.download = "strings-export.json";
+      document.body.appendChild(a);
+      a.click();
+
+      a.remove();
+      URL.revokeObjectURL(url);
+
+      showMsg("Export downloaded", 2000);
+    } catch (err) {
+      console.error(err);
+      showMsg("Export failed", 2500);
+    } finally {
+      exportStringsBtn.disabled = false;
+      exportStringsBtn.textContent = "Strings als JSON exportieren";
+    }
+  });
+}
