@@ -8,6 +8,9 @@ from ..email_utils import send_email
 from ..config import APP_BASE_URL
 import secrets
 from datetime import timedelta
+from fastapi.responses import JSONResponse
+import json
+from fastapi import Response
 
 router = APIRouter(tags=["account"])
 
@@ -118,3 +121,58 @@ def save_account_timezone(payload: TimezoneIn, user_id: int = Depends(get_curren
         return {"ok": True, "timezone": timezone}
     finally:
         con.close()
+
+
+@router.get("/account/export")
+def export_account_strings(user_id: int = Depends(get_current_user_id)):
+    con = connect()
+    cur = con.cursor()
+
+    cur.execute(
+        """
+        SELECT 
+            id,
+            content,
+            created_at,
+            blocktime,
+            hashed_string,
+            txid
+        FROM thoughts
+        WHERE user_id = %s
+        ORDER BY created_at DESC
+        """,
+        (user_id,)
+    )
+
+    rows = cur.fetchall()
+    con.close()
+
+    data = {
+        "version": 1,
+        "count": len(rows),
+        "strings": [
+            {
+                "id": row["id"],
+                "content": row["content"],
+                "created_at": row["created_at"].isoformat() if row["created_at"] else None,
+                "blocktime": row["blocktime"],
+                "hash": row["hashed_string"],
+                "txid": row["txid"],
+            }
+            for row in rows
+        ]
+    }
+
+    json_text = json.dumps(
+        data,
+        ensure_ascii=False,
+        indent=2
+    )
+
+    return Response(
+        content=json_text,
+        media_type="application/json",
+        headers={
+            "Content-Disposition": "attachment; filename=strings-export.json"
+        }
+    )
