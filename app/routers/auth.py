@@ -1,8 +1,12 @@
 import secrets
 
 from datetime import timedelta
-from fastapi import APIRouter, Depends, HTTPException, Response, Form
+from fastapi import APIRouter, Depends, HTTPException, Response, Form, Request
 from fastapi.responses import HTMLResponse
+
+from app.limiter import limiter
+from app.turnstile import verify_turnstile_token
+from app.rate_limit import assert_rate_limit, normalize_email
 
 from app.config import (
     APP_BASE_URL,
@@ -36,13 +40,42 @@ def logout(response: Response):
     return {"ok": True}
 
 
+
 @router.post("/signup")
-def signup(payload: SignupIn):
-    email = payload.email.strip().lower()
+@limiter.limit("5/minute")
+async def signup(request:Request, payload: SignupIn):
+    # 1. Honeypot: normale Nutzer füllen das nicht aus
+    if payload.website:
+        raise HTTPException(status_code=400, detail="Ungültige Anfrage")
+
+    email = normalize_email(payload.email)
     username = payload.username.strip()
 
     if not username:
         raise HTTPException(status_code=400, detail="A username is required")
+
+    # 2. Rate Limit nach E-Mail
+    assert_rate_limit(
+        scope="signup_email",
+        key=email,
+        max_events=3,
+        window_seconds=60 * 60,
+    )
+
+    # 3. Rate Limit nach E-Mail-Domain
+    domain = email.split("@")[-1]
+    assert_rate_limit(
+        scope="signup_domain",
+        key=domain,
+        max_events=30,
+        window_seconds=60 * 60,
+    )
+
+    # 4. Turnstile serverseitig prüfen
+    await verify_turnstile_token(payload.turnstile_token, request)
+
+
+
 
     pw_hash = hash_password(payload.password)
 
@@ -146,11 +179,18 @@ def verify_email(token: str):
     finally:
         con.close()
 
-
 @router.post("/login")
-def login(data: LoginIn, response: Response):
+@limiter.limit("10/minute")
+def login(request: Request, data: LoginIn, response: Response):
     login_value = data.login.strip()
     login_value_lower = login_value.lower()
+
+    assert_rate_limit(
+        scope="login_user",
+        key=login_value_lower,
+        max_events=10,
+        window_seconds=10 * 60,
+    )
 
     con = connect()
     try:

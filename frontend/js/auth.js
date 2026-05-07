@@ -17,7 +17,15 @@ import {
   loginView,
 } from "./dom.js";
 import { showMsg, showOnly } from "./ui.js";
+let turnstileToken = "";
 
+window.onTurnstileSuccess = function (token) {
+  turnstileToken = token;
+};
+
+window.onTurnstileExpired = function () {
+  turnstileToken = "";
+};
 export async function isLoggedIn() {
   try {
     const res = await apiRaw("/api/me", { credentials: "include" });
@@ -45,6 +53,10 @@ export function initAuthEvents() {
     if (signupEmailInput) signupEmailInput.value = "";
     if (signupUsernameInput) signupUsernameInput.value = "";
     if (signupPasswordInput) signupPasswordInput.value = "";
+    turnstileToken = "";
+    if (window.turnstile) {
+      window.turnstile.reset();
+    }
   });
 
   backToLoginBtn?.addEventListener("click", () => {
@@ -54,6 +66,8 @@ export function initAuthEvents() {
   loginBtn?.addEventListener("click", async () => {
     const login = loginInput.value.trim();
     const password = loginPasswordInput.value;
+
+
 
     try {
       await apiFetch("/api/login", {
@@ -79,6 +93,7 @@ export function initAuthEvents() {
       showMsg(err.message || "Login failed", 3000);
       if (state.failedLocal >= 5 && resetPwBtn) resetPwBtn.style.display = "inline-block";
     }
+
   });
 
   resetPwBtn?.addEventListener("click", async () => {
@@ -102,11 +117,14 @@ export function initAuthEvents() {
     const email = signupEmailInput.value.trim();
     const username = signupUsernameInput.value.trim();
     const password = signupPasswordInput.value;
-
+    if (!turnstileToken) {
+      showMsg("Bitte bestätige die Sicherheitsprüfung.", 2500);
+      return;
+    }
     try {
       const data = await apiFetch("/api/signup", {
         method: "POST",
-        body: JSON.stringify({ email, username, password }),
+        body: JSON.stringify({ email, username, password,turnstile_token: turnstileToken  }),
       });
 
       showMsg(data.message || "Please verify your email address.", 5000);
@@ -118,6 +136,13 @@ export function initAuthEvents() {
         showMsg(err.message || "Error during creation.", 3000);
       }
     }
+	finally {
+	    if (window.turnstile) {
+	      window.turnstile.reset();
+	    }
+
+	    turnstileToken = "";
+	  }
   });
 
   logoutBtn?.addEventListener("click", async () => {

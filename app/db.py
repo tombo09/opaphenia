@@ -51,6 +51,14 @@ def init_db():
       used BOOLEAN NOT NULL DEFAULT FALSE,
       created_at TIMESTAMPTZ NOT NULL DEFAULT now()
     );
+    CREATE TABLE IF NOT EXISTS rate_limit_events (
+        id BIGSERIAL PRIMARY KEY,
+        scope TEXT NOT NULL,
+        key TEXT NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT now()
+    );
+    CREATE INDEX IF NOT EXISTS idx_rate_limit_events_scope_key_created
+    ON rate_limit_events(scope, key, created_at);
     """
     con = connect()
     with con:

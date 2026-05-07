@@ -16,6 +16,8 @@ class SignupIn(BaseModel):
     email: EmailStr
     username: str = Field(min_length=3, max_length=30)
     password: str
+    turnstile_token: str
+    website: str | None = None
 
 
 class EmailUpdateIn(BaseModel):

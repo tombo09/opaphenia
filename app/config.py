@@ -5,6 +5,8 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 # Für Links in Emails (später https://deinedomain.tld)
 APP_BASE_URL = "https://opaphenia.com"
 
+TURNSTILE_SECRET_KEY = os.getenv("TURNSTILE_SECRET_KEY")
+
 # JWT
 SECRET_KEY = os.getenv("SECRET_KEY", "CHANGE_ME_IN_PROD")
 ALGORITHM = "HS256"
