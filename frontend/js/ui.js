@@ -132,3 +132,13 @@ export function closeProofHashModal() {
   if (!proofHashModal) return;
   proofHashModal.style.display = "none";
 }
+
+
+
+const proofFlipBox = document.querySelector(".proofFlipBox");
+
+if (proofFlipBox) {
+  proofFlipBox.addEventListener("click", () => {
+    proofFlipBox.classList.toggle("isFlipped");
+  });
+}
