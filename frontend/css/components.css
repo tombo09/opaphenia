@@ -139,35 +139,45 @@
   transform: translateY(0);
 }
 
+
 .btn {
   appearance: none;
-  border: 1px solid #dddddd;
-  background: #f3f3f3;
-  color: #111111;
-  padding: 4px 6px;
-  border-radius: 8px;
+  border: 1px solid #111;
+  background: #111;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 999px;
   cursor: pointer;
   font-family: Arial, sans-serif;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 800;
   line-height: 1.2;
   box-sizing: border-box;
-  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+  text-decoration: none;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease,
+    opacity 0.15s ease;
 }
 
 .btn:hover {
-  background: #f7f7f7;
-  border-color: #cfcfcf;
+  background: #fff;
+  color: #111;
+  border-color: #111;
 }
 
 .btn:active {
-  background: #efefef;
+  transform: translateY(1px);
 }
 
 .btn:disabled {
-  opacity: 0.35;
+  opacity: 0.25;
   cursor: default;
+  transform: none;
 }
+
 
 .btnPost {
   background: #111;
@@ -293,4 +303,11 @@
   100% {
     opacity: 1;
   }
+}
+
+.hp-field {
+  position: absolute;
+  left: -9999px;
+  opacity: 0;
+  pointer-events: none;
 }

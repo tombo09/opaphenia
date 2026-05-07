@@ -147,41 +147,28 @@
 }
 
 .typingWrap {
-  position: relative;
   width: 100%;
-  min-height: 70vh;
 }
 
 .typingPos1,
 .typingPos2,
 .typingPos3 {
-  position: absolute;
+  position: static;
   margin: 0;
-  display: inline-block;
-  max-width: 85vw;
+  display: block;
+  max-width: 100%;
   word-break: normal;
-  overflow-wrap: normal;
+  overflow-wrap: anywhere;
+  transform: none;
 }
 
-.typingPos1 {
-  left: 5%;
-  top: 55%;
-  transform: rotate(-20deg);
-  transform-origin: left bottom;
-}
-
-.typingPos2 {
-  left: 15%;
-  top: 10%;
-  transform: rotate(25deg);
-  transform-origin: left top;
-}
-
+.typingPos1,
+.typingPos2,
 .typingPos3 {
-  left: 50%;
-  bottom: 8%;
-  transform: rotate(-10deg);
-  transform-origin: left bottom;
+  left: auto;
+  top: auto;
+  right: auto;
+  bottom: auto;
 }
 
 .stringsListBox {
@@ -244,9 +231,14 @@
   overflow: hidden;
 }
 
+
+.accountCard h3,
+.accountCard h4 {
+  margin-bottom: 6px;
+}
+
+
 #saveTimezoneBtn,
-#loginBtn,
-#openSignupBtn,
 #saveEmailBtn,
 #cancelEmailBtn,
 #savePwBtn,
@@ -271,8 +263,6 @@
 }
 
 #saveTimezoneBtn:hover,
-#loginBtn:hover,
-#openSignupBtn:hover,
 #saveEmailBtn:hover,
 #cancelEmailBtn:hover,
 #savePwBtn:hover,
@@ -281,21 +271,16 @@
   border-color: #cfcfcf;
 }
 
-.accountCard h3,
-.accountCard h4 {
-  margin-bottom: 6px;
-}
 
 #saveTimezoneBtn:active,
 #copyLinkBtn:active,
-#loginBtn:active,
-#openSignupBtn:active,
 #saveEmailBtn:active,
 #cancelEmailBtn:active,
 #savePwBtn:active,
 #saveVisibilityBtn:active {
   background: #cfcfcf;
 }
+
 
 #accountTimezone {
   width: 100%;

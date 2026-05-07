@@ -4,43 +4,330 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>opaphenia</title>
-   <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<style>
+  /* Frontpage only */
+  .homeFront {
+    width: 100%;
+    min-height: calc(100vh - 90px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 56px 18px;
+    color: #111;
+    background: #fff;
+  }
+
+  .homeShell {
+    width: min(980px, 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 26px;
+    text-align: center;
+  }
+
+  .heroKicker {
+    font-size: 13px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #555;
+  }
+
+  .heroTitle {
+    margin: 0;
+    font-size: clamp(58px, 10vw, 118px);
+    line-height: 0.88;
+    letter-spacing: -0.08em;
+    font-weight: 900;
+    color: #111;
+  }
+
+  .heroTitle span {
+    display: block;
+  }
+
+  .homeThoughtBox {
+    width: min(620px, 100%);
+    border: 1px solid #111;
+    border-radius: 28px;
+    padding: 18px;
+    background: #fff;
+    box-shadow: 10px 10px 0 #111;
+    text-align: left;
+  }
+
+  .thoughtBoxPreview {
+    border: 1px solid #111;
+    border-radius: 22px;
+    padding: 18px;
+    background: #fff;
+  }
+
+
+
+.thoughtCloseMock {
+  margin-left: auto;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #111;
+  border-radius: 999px;
+  background: #fff;
+  color: #111;
+  font-size: 22px;
+  line-height: 1;
+  font-weight: 500;
+  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+  .thoughtTextareaMock {
+    width: 100%;
+    min-height: 150px;
+    border: 1px solid #111;
+    border-radius: 18px;
+    padding: 18px;
+    font: inherit;
+    font-size: 18px;
+    line-height: 1.5;
+    color: #111;
+    background:
+      linear-gradient(#fff, #fff) padding-box,
+      repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent 29px,
+        rgba(0,0,0,0.13) 30px
+      );
+    white-space: pre-wrap;
+  }
+
+  .thoughtTextareaMock::after {
+    content: "|";
+    display: inline-block;
+    margin-left: 2px;
+    animation: cursorBlink 0.8s infinite;
+  }
+
+  @keyframes cursorBlink {
+    0%, 45% {
+      opacity: 1;
+    }
+    46%, 100% {
+      opacity: 0;
+    }
+  }
+
+.thoughtBoxBottom {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 14px;
+}
+
+
+
+  .pushThoughtBtnMock {
+    border: 1px solid #111;
+    border-radius: 999px;
+    padding: 10px 18px;
+    background: #111;
+    color: #fff;
+    font-weight: 700;
+    font-size: 14px;
+    text-decoration: none;
+    box-shadow: 4px 4px 0 #777;
+  }
+
+  .heroActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .githubBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: 1px solid #111;
+    border-radius: 999px;
+    padding: 13px 22px;
+    background: #111;
+    color: #fff;
+    font-weight: 800;
+    text-decoration: none;
+    box-shadow: 5px 5px 0 #777;
+  }
+
+  .githubBtn:hover {
+    transform: translate(1px, 1px);
+    box-shadow: 4px 4px 0 #777;
+  }
+
+  .homeInfoGrid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 8px;
+  }
+
+  .homeInfoBox {
+    border: 1px solid #111;
+    border-radius: 22px;
+    padding: 18px;
+    background: #fff;
+    min-height: 145px;
+    box-shadow: 6px 6px 0 #111;
+    text-align: left;
+  }
+
+  .homeInfoBox h3 {
+    margin: 0 0 10px;
+    font-size: 17px;
+    color: #111;
+  }
+
+  .homeInfoBox p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #333;
+  }
+
+  @media (max-width: 800px) {
+    .homeInfoGrid {
+      grid-template-columns: 1fr;
+    }
+
+    .heroTitle {
+      font-size: clamp(52px, 15vw, 86px);
+    }
+  }
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.homeFront,
+.homeShell,
+.homeThoughtBox,
+.homeInfoGrid {
+  max-width: 100%;
+}
+
+.homeThoughtBox,
+.homeInfoBox,
+.githubBtn,
+.pushThoughtBtnMock {
+  box-shadow: none;
+}
+</style>
+
+
 </head>
-<div id="msgToast" class="msgToast"></div>
 
 <body>
-<div class="topbar">
-<div class="leftArea">
-  <button id="homeBtn" class ="btn">home</button>
+<div id="msgToast" class="msgToast"></div>
 
-  <div class="searchBox">
-    <div class="searchRow">
-      <input id="searchAccInput" type="text" placeholder="search username" />
+<div class="topbar">
+  <div class="leftArea">
+    <button id="homeBtn" class="btn">home</button>
+
+    <div class="searchBox">
+      <div class="searchRow">
+        <input id="searchAccInput" type="text" placeholder="search username" />
+      </div>
+      <div id="searchResults" class="searchDropdown"></div>
     </div>
-    <div id="searchResults" class="searchDropdown"></div>
   </div>
-</div>
+
   <div class="rightArea">
     <button id="overviewBtn" style="display:none;">Overview</button>
-    <button id="accountBtn" class ="btn">Account</button>
-    <button id="logoutBtn" class ="btn" style="display:none;">Logout</button>
+    <button id="accountBtn" class="btn">Account</button>
+    <button id="logoutBtn" class="btn" style="display:none;">Logout</button>
   </div>
 </div>
-<div id="homeView" class="view" style="display:none;">
-  <div class="typingWrap">
-    <h2 id="typingTitle" class="typingDiagonal"></h2>
-  </div>
-</div>
-  <p id="msg"></p>
 
-  <!-- Views -->
+<div id="homeView" class="view" style="display:none;">
+  <section class="homeFront">
+    <div class="homeShell">
+
+      <div class="heroKicker">opaphenia</div>
+
+      <h1 class="heroTitle">
+        <span>write it.</span>
+      </h1>
+
+      <div class="homeThoughtBox">
+        <div class="thoughtBoxPreview">
+          <div class="thoughtBoxTop">
+            <button class="thoughtCloseMock" type="button">×</button>
+          </div>
+
+          <div id="typingTitle" class="thoughtTextareaMock"></div>
+
+          <div class="thoughtBoxBottom">
+            <span class="pushThoughtBtnMock">push it!</span>
+          </div>
+        </div>
+      </div>
+
+      <h1 class="heroTitle">
+        <span>prove it.</span>
+      </h1>
+
+      <div class="heroActions">
+        <a class="githubBtn" href="https://github.com/" target="_blank" rel="noopener noreferrer">
+          GitHub
+        </a>
+      </div>
+
+      <div class="homeInfoGrid">
+        <div class="homeInfoBox">
+          <h3>write</h3>
+          <p>Save short text entries in a clean, focused interface.</p>
+        </div>
+
+        <div class="homeInfoBox">
+          <h3>share</h3>
+          <p>Choose whether your written strings are private or public.</p>
+        </div>
+
+        <div class="homeInfoBox">
+          <h3>prove</h3>
+          <p>Attach reproducible proof data such as hashes and timestamps.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</div>
+
+<p id="msg"></p>
+
+<!-- Views -->
 <div id="loginView" class="view" style="display:none;">
   <div class="card loginCard">
     <input id="loginInput" type="text" placeholder="email or username..." />
     <input id="loginPasswordInput" type="password" placeholder="type password..." />
     <div class="btnRow">
-      <button id="loginBtn" class ="btn">logIn</button>
-      <button id="openSignupBtn" class ="btn">new account</button>
+      <button id="loginBtn" class="btn">logIn</button>
+      <button id="openSignupBtn" class="btn">new account</button>
     </div>
     <button id="resetPwBtn" class="btn" style="display:none;">Reset password</button>
   </div>
@@ -48,13 +335,34 @@
 
 <div id="signupView" class="view" style="display:none;">
   <div class="card loginCard">
+
     <input id="signupEmailInput" type="email" placeholder="type email..." />
     <input id="signupUsernameInput" type="text" placeholder="choose username..." />
     <input id="signupPasswordInput" type="password" placeholder="type password..." />
+
+    <input
+      id="website"
+      name="website"
+      type="text"
+      autocomplete="off"
+      tabindex="-1"
+      aria-hidden="true"
+      class="hp-field"
+    />
+
+    <div
+      class="cf-turnstile"
+      data-sitekey="0x4AAAAAADKXaymjn1wmLr6A"
+      data-callback="onTurnstileSuccess"
+      data-theme="light"
+      data-expired-callback="onTurnstileExpired"
+    ></div>
+
     <div class="btnRow">
-      <button id="signupBtn" class = "btn">create account</button>
+      <button id="signupBtn" class="btn">create account</button>
       <button id="backToLoginBtn" class="btn">back</button>
     </div>
+
   </div>
 </div>
 
@@ -68,52 +376,47 @@
   </div>
 </div>
 
-<div id="stringsList" style="margin-top:12px;"></div>
+<div id="accountView" class="view" style="display:none;">
+  <div class="card accountCard">
+    <h3 id="accountUsername"></h3>
 
-      <div id="stringsList" style="display:none; margin-top:12px;"></div>
+    <label class="row">
+      <input type="checkbox" id="publicStringsChk" />
+      Make my written strings public
+    </label>
+    <button id="saveVisibilityBtn" class="btn" > save</button>
+
+    <hr />
+
+    <h4>Email</h4>
+    <input id="accountEmail" type="email" readonly />
+    <div class="btnRow">
+      <button id="saveEmailBtn" class="btn" style="display:none;">Save</button>
+      <button id="cancelEmailBtn" class="btn" style="display:none;">Cancel</button>
+    </div>
+
+    <h4>Password</h4>
+    <input id="oldPw" type="password" placeholder="old password" />
+    <input id="newPw" type="password" placeholder="new password" />
+    <input id="newPw2" type="password" placeholder="repeat new password" />
+    <button id="savePwBtn" class="btn">save</button>
+
+    <hr />
+
+    <div class="accountSection">
+      <h4>Time zone</h4>
+      <select id="accountTimezone">
+        <option value="Europe/Berlin">Europe/Berlin</option>
+        <option value="UTC">UTC</option>
+        <option value="Europe/London">Europe/London</option>
+        <option value="America/New_York">America/New_York</option>
+        <option value="America/Los_Angeles">America/Los_Angeles</option>
+        <option value="Asia/Tokyo">Asia/Tokyo</option>
+      </select>
+      <button id="saveTimezoneBtn" class="btn">save</button>
     </div>
   </div>
-
-  <div id="accountView" class="view" style="display:none;">
-    <div class="card accountCard">
-      <h3 id="accountUsername"></h3>
-
-      <label class="row">
-        <input type="checkbox" id="publicStringsChk" />
-        Make my written strings public
-      </label>
-      <button id="saveVisibilityBtn">save</button>
-
-      <hr />
-
-      <h4>Email</h4>
-      <input id="accountEmail" type="email" readonly />
-      <div class="btnRow">
-        <button id="saveEmailBtn" style="display:none;">Save</button>
-        <button id="cancelEmailBtn" style="display:none;">Cancel</button>
-      </div>
-
-      <h4>Password</h4>
-      <input id="oldPw" type="password" placeholder="old password" />
-      <input id="newPw" type="password" placeholder="new password" />
-      <input id="newPw2" type="password" placeholder="repeat new password" />
-      <button id="savePwBtn">save</button>
-      <hr />
-
-      <div class="accountSection">
-        <h4>Time zone</h4>
-        <select id="accountTimezone">
-          <option value="Europe/Berlin">Europe/Berlin</option>
-          <option value="UTC">UTC</option>
-          <option value="Europe/London">Europe/London</option>
-          <option value="America/New_York">America/New_York</option>
-          <option value="America/Los_Angeles">America/Los_Angeles</option>
-          <option value="Asia/Tokyo">Asia/Tokyo</option>
-        </select>
-        <button id="saveTimezoneBtn">save</button>
-      </div>
-    </div>
-  </div>
+</div>
 
 <div id="searchView" class="view" style="display:block;">
   <div class="card">
@@ -136,6 +439,7 @@
     </div>
   </div>
 </div>
+
 <div id="proofHashModal" class="modalOverlay" style="display:none;">
   <div class="modalCard">
     <button id="closeProofHashModalBtn" class="modalCloseBtn" type="button">&times;</button>
