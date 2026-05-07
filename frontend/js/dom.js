@@ -56,6 +56,8 @@ export const closeProofHashModalBtn = document.getElementById("closeProofHashMod
 
 export const msg = document.getElementById("msgToast");
 
+
+
 export const views = [
   homeView,
   loginView,

@@ -60,29 +60,31 @@
 
   .thoughtBoxPreview {
     border: 1px solid #111;
+    width: min(620px, 100%);
     border-radius: 22px;
     padding: 18px;
     background: #fff;
+    text-align:left;
   }
 
 
 
 .thoughtCloseMock {
   margin-left: auto;
-  width: 30px;
-  height: 30px;
+  width: 20px;
+  height: 20px;
   border: 1px solid #111;
   border-radius: 999px;
   background: #fff;
   color: #111;
-  font-size: 22px;
+  font-size: 15px;
   line-height: 1;
   font-weight: 500;
   cursor: default;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
+  padding: 8;
 }
   .thoughtTextareaMock {
     width: 100%;
@@ -273,10 +275,9 @@ body {
         <span>write it.</span>
       </h1>
 
-      <div class="homeThoughtBox">
         <div class="thoughtBoxPreview">
           <div class="thoughtBoxTop">
-            <button class="thoughtCloseMock" type="button">×</button>
+<div class="thoughtUserMock" id="thoughtUserMock">@ada</div>
           </div>
 
           <div id="typingTitle" class="thoughtTextareaMock"></div>
@@ -285,7 +286,6 @@ body {
             <span class="pushThoughtBtnMock">push it!</span>
           </div>
         </div>
-      </div>
 
       <h1 class="heroTitle">
         <span>prove it.</span>
@@ -305,12 +305,12 @@ body {
 
         <div class="homeInfoBox">
           <h3>share</h3>
-          <p>Choose whether your written strings are private or public.</p>
+          <p>2.your strings get a hash and is pushed on chain</p>
         </div>
 
         <div class="homeInfoBox">
           <h3>prove</h3>
-          <p>Attach reproducible proof data such as hashes and timestamps.</p>
+          <p>3. proof that you wrote the string at this time.</p>
         </div>
       </div>
 

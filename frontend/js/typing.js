@@ -1,16 +1,16 @@
 let typingTimeout = null;
 let typingLoopActive = false;
 
-export function stopTypingLoop() {
-  typingLoopActive = false;
+export function stopTypingLoop() { typingLoopActive = false; if (typingTimeout) { clearTimeout(typingTimeout); typingTimeout = null; } }
 
-  if (typingTimeout) {
-    clearTimeout(typingTimeout);
-    typingTimeout = null;
-  }
-}
 
-export function startTypingWords(element, words, speed = 50, pauseAfterWord = 10000) {
+export function startTypingWords(
+  element,
+  words,
+  speed = 50,
+  pauseAfterWord = 10000,
+  usernameElement = null
+) {
   if (!element || !Array.isArray(words) || words.length === 0) return;
 
   stopTypingLoop();
@@ -22,12 +22,18 @@ export function startTypingWords(element, words, speed = 50, pauseAfterWord = 10
     if (!typingLoopActive) return;
 
     const entry = words[wordIndex];
+
     const text = typeof entry === "string" ? entry : entry.text;
     const className = typeof entry === "string" ? "" : entry.className || "";
+    const username = typeof entry === "string" ? "" : entry.username || "";
 
     let charIndex = 0;
+
     element.textContent = "";
-    element.className = className;
+    element.className = `thoughtTextareaMock ${className}`.trim();
+    if (usernameElement) {
+      usernameElement.textContent = username;
+    }
 
     function step() {
       if (!typingLoopActive) return;

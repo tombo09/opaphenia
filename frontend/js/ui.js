@@ -62,26 +62,26 @@ export function showOnly(viewEl) {
   }
 
   const typingTitle = document.getElementById("typingTitle");
-
+  const thoughtUserMock = document.getElementById("thoughtUserMock");
   if (viewEl === homeView) {
     startTypingWords(
       typingTitle,
       [
-        {
+        { username: "@tombo09, 30.06.2012 08:29:56",
           text: "If this page is forced to disappear your strings/words/work remain",
           className: "typingPos1",
         },
-        {
+        { username: "@lisa, 1.01.2025 19:06:39",
           text: "this is not for fast pace typing aka doing writing mistakes i want to change it after few seconds environment",
           className: "typingPos2",
         },
-        {
+        { username: "@testor",
           text: "this project runs as long some people believe in it ",
           className: "typingPos3",
         },
       ],
       80,
-      3000
+      3000, thoughtUserMock
     );
   } else {
     stopTypingLoop();
