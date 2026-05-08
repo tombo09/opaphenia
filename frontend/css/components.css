@@ -313,3 +313,19 @@
   opacity: 0;
   pointer-events: none;
 }
+
+.accountSection {
+  width: 100%;
+}
+
+.exportSection {
+  padding-top: 4px;
+  padding-bottom: 8px;
+}
+
+.accountDivider {
+  width: 100%;
+  border: 0;
+  border-top: 1px solid #ddd;
+  margin: 18px 0;
+}

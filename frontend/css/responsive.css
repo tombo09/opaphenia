@@ -51,3 +51,37 @@
     box-sizing: border-box;
   }
 }
+
+@media (max-width: 600px) {
+  #accountView {
+    position: static;
+    min-height: calc(100vh - 72px);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 24px 12px 32px;
+    box-sizing: border-box;
+    overflow: visible;
+  }
+
+  .accountCard {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+  }
+
+  .accountSection {
+    margin-bottom: 20px;
+  }
+
+  .exportSection {
+    margin-top: 8px;
+    padding-top: 8px;
+  }
+
+  #exportStringsBtn {
+    width: 100%;
+    min-height: 44px;
+    display: block;
+  }
+}
