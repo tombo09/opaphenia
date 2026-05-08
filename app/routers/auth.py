@@ -175,7 +175,7 @@ def verify_email(token: str):
             )
             con.commit()
 
-        return "<h3><Email successfully verified./h3>"
+        return "<h3><Email successfully verified.</h3>"
     finally:
         con.close()
 

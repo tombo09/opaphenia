@@ -130,7 +130,7 @@ def export_account_strings(user_id: int = Depends(get_current_user_id)):
 
     cur.execute(
         """
-        SELECT 
+        SELECT
             id,
             content,
             created_at,
@@ -155,12 +155,12 @@ def export_account_strings(user_id: int = Depends(get_current_user_id)):
                 "id": row["id"],
                 "content": row["content"],
                 "created_at": row["created_at"].isoformat() if row["created_at"] else None,
-                "blocktime": row["blocktime"],
+                "blocktime": row["blocktime"].isoformat() if hasattr(row["blocktime"], "isoformat") else row["blocktime"],
                 "hash": row["hashed_string"],
                 "txid": row["txid"],
             }
             for row in rows
-        ]
+        ],
     }
 
     json_text = json.dumps(

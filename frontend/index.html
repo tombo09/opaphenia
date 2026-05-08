@@ -676,13 +676,7 @@ body {
       class="hp-field"
     />
 
-    <div
-      class="cf-turnstile"
-      data-sitekey="0x4AAAAAADKXaymjn1wmLr6A"
-      data-callback="onTurnstileSuccess"
-      data-theme="light"
-      data-expired-callback="onTurnstileExpired"
-    ></div>
+<div id="signupTurnstile"></div>
 
     <div class="btnRow">
       <button id="signupBtn" class="btn">create account</button>
@@ -780,6 +774,19 @@ body {
   </div>
 </div>
 
+<script>
+  window.onTurnstileLoad = function () {
+    window.dispatchEvent(new Event("turnstile-ready"));
+  };
+</script>
+
+<script type="module" src="/js/main.js?v=5"></script>
+
+<script
+  src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstileLoad"
+  async
+  defer>
+</script>
 <script type="module" src="/js/app.js"></script>
 </body>
 </html>

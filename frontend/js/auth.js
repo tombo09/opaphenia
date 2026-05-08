@@ -18,14 +18,41 @@ import {
 } from "./dom.js";
 import { showMsg, showOnly } from "./ui.js";
 let turnstileToken = "";
+let turnstileWidgetId = null;
 
-window.onTurnstileSuccess = function (token) {
-  turnstileToken = token;
-};
+function renderSignupTurnstile() {
+  if (!window.turnstile) return;
+  if (turnstileWidgetId !== null) return;
 
-window.onTurnstileExpired = function () {
-  turnstileToken = "";
-};
+  const el = document.getElementById("signupTurnstile");
+  if (!el) return;
+
+  turnstileWidgetId = window.turnstile.render(el, {
+    sitekey: "0x4AAAAAADKXaymjn1wmLr6A",
+    theme: "light",
+
+    callback(token) {
+      console.log("Turnstile success token:", token);
+      turnstileToken = token;
+    },
+
+    "expired-callback"() {
+      console.log("Turnstile expired");
+      turnstileToken = "";
+    },
+
+    "error-callback"() {
+      console.log("Turnstile error");
+      turnstileToken = "";
+    },
+  });
+}
+
+window.addEventListener("turnstile-ready", renderSignupTurnstile);
+
+if (window.turnstile) {
+  renderSignupTurnstile();
+}
 export async function isLoggedIn() {
   try {
     const res = await apiRaw("/api/me", { credentials: "include" });
@@ -54,9 +81,12 @@ export function initAuthEvents() {
     if (signupUsernameInput) signupUsernameInput.value = "";
     if (signupPasswordInput) signupPasswordInput.value = "";
     turnstileToken = "";
-    if (window.turnstile) {
-      window.turnstile.reset();
-    }
+
+      if (window.turnstile && turnstileWidgetId !== null) {
+        window.turnstile.reset(turnstileWidgetId);
+      } else {
+	  renderSignupTurnstile();
+	}
   });
 
   backToLoginBtn?.addEventListener("click", () => {
@@ -137,11 +167,11 @@ export function initAuthEvents() {
       }
     }
 	finally {
-	    if (window.turnstile) {
-	      window.turnstile.reset();
-	    }
+	if (window.turnstile && turnstileWidgetId !== null) {
+	  window.turnstile.reset(turnstileWidgetId);
+	}
 
-	    turnstileToken = "";
+	turnstileToken = "";
 	  }
   });
 
