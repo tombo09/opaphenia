@@ -7,6 +7,7 @@ import hashlib
 import unicodedata
 from eth_account import Account
 import os
+import time
 
 PK = os.getenv("ETH_PK")
 if not PK:
@@ -35,8 +36,8 @@ def to_sqlite_dt(dt: datetime) -> str:
 def execute_string(string, username):
     content = normalize_text(with_prefix(string, username))
     hashed_content = hash_string(string, username)
-    #txid = push_on_chain(hashed_content)
-    txid = "0x8df388d1b8ec14a7e186e436ee4b68463ae6dc31f40afb3b9b6ee3244a66a926"
+    txid = push_on_chain(hashed_content)
+    #txid = "0x8df388d1b8ec14a7e186e436ee4b68463ae6dc31f40afb3b9b6ee3244a66a926"
     return content, hashed_content, txid
 
 version = 1
@@ -54,12 +55,37 @@ def hash_string(text: str, username) -> str:
     return "0x" + hashlib.sha256(normalized.encode("utf-8")).hexdigest()
 
 
-def get_time(ts_hash):
-    block_number = rpc_call("eth_getTransactionByHash", [ts_hash])["blockNumber"]
-    block = rpc_call("eth_getBlockByNumber", [block_number, False])
-    block_time = block["timestamp"]
-    timestamp = int(block_time, 16)
-    return datetime.fromtimestamp(timestamp, tz=timezone.utc)
+def get_time(tx_hash, wait=True, timeout=120, poll_interval=3):
+    start = time.time()
+
+    while True:
+        tx = rpc_call("eth_getTransactionByHash", [tx_hash])
+
+        if tx is not None:
+            block_number = tx.get("blockNumber")
+
+            if block_number is not None:
+                block = rpc_call("eth_getBlockByNumber", [block_number, False])
+
+                if block is None:
+                    raise Exception(f"Block not found: {block_number}")
+
+                block_time = block["timestamp"]
+                timestamp = int(block_time, 16)
+
+                return datetime.fromtimestamp(timestamp, tz=timezone.utc)
+
+            if not wait:
+                raise Exception(f"Transaction is still pending: {tx_hash}")
+
+        else:
+            if not wait:
+                raise Exception(f"Transaction not found: {tx_hash}")
+
+        if time.time() - start > timeout:
+            raise TimeoutError(f"Transaction not mined within {timeout} seconds: {tx_hash}")
+
+        time.sleep(poll_interval)
 
 def get_input(ts_hash):
     return rpc_call("eth_getTransactionByHash", [ts_hash])["input"]
@@ -121,6 +147,58 @@ def execute_ts(hash):
     # 6) Broadcast
     tx_hash = rpc_call("eth_sendRawTransaction", ["0x" + raw if not raw.startswith("0x") else raw])
     return ADDR, tx_hash
+
+
+
+def push_on_chain(hash):
+    # 1) chainId (Mainnet = 1)
+    chain_id = int(rpc_call("eth_chainId", []), 16)
+    if chain_id != 1:
+        raise RuntimeError(f"not Mainnet (chainId={chain_id})")
+
+    # 2) nonce (pending)
+    nonce = int(rpc_call("eth_getTransactionCount", [ADDR, "pending"]), 16)
+
+    # 3) Gas-Fees (EIP-1559)
+    latest = rpc_call("eth_getBlockByNumber", ["latest", False])
+    base_fee = int(latest["baseFeePerGas"], 16)
+
+    prio_hex = rpc_call("eth_maxPriorityFeePerGas", [])
+    priority = 5 * 10**8  # 2 gwei
+    max_fee = base_fee + 2 * priority
+
+    # 4) Gas limit schätzen
+    tx_for_estimate = {
+        "from": ADDR,
+        "to": ADDR,
+        "value": hex(0),
+        "data": CALLDATA,
+        "maxFeePerGas": hex(max_fee),
+        "maxPriorityFeePerGas": hex(priority),
+    }
+    gas = int(rpc_call("eth_estimateGas", [tx_for_estimate]), 16)
+
+
+    # 5) Type-2 TX bauen und signieren
+    tx = {
+        "type": 2,
+        "chainId": chain_id,
+        "nonce": nonce,
+        "to": ADDR,
+        "value": 0,
+        "data": CALLDATA,
+        "gas": gas,
+        "maxFeePerGas": max_fee,
+        "maxPriorityFeePerGas": priority,
+    }
+
+    signed = acct.sign_transaction(tx)
+    raw = signed.raw_transaction.hex()
+
+    # 6) Broadcast
+    tx_hash = rpc_call("eth_sendRawTransaction", ["0x" + raw if not raw.startswith("0x") else raw])
+    return tx_hash
+
 
 def etherscan_link(txid):
     return f"https://www.etherscan.io/tx/{txid}"
