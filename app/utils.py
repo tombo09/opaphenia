@@ -164,7 +164,7 @@ def push_on_chain(hash):
     base_fee = int(latest["baseFeePerGas"], 16)
 
     prio_hex = rpc_call("eth_maxPriorityFeePerGas", [])
-    priority = 5 * 10**8  # 2 gwei
+    priority = 2 * 10**8  
     max_fee = base_fee + 2 * priority
 
     # 4) Gas limit schätzen
@@ -172,7 +172,7 @@ def push_on_chain(hash):
         "from": ADDR,
         "to": ADDR,
         "value": hex(0),
-        "data": CALLDATA,
+        "data": hash,
         "maxFeePerGas": hex(max_fee),
         "maxPriorityFeePerGas": hex(priority),
     }
