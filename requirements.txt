@@ -11,3 +11,4 @@ setuptools
 eth-account
 requests
 openai
+slowapi
