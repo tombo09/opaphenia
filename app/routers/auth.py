@@ -153,10 +153,10 @@ def verify_email(token: str):
             used = row["used"]
 
             if used is True:
-                return "<h3><This link has already been used./h3>"
+                return "<h3>This link has already been used.</h3>"
 
             if now_utc() > expires_at:
-                return "<h3><The link has expired./h3>"
+                return "<h3>The link has expired.</h3>"
 
             if purpose == "signup":
                 cur.execute(
@@ -175,7 +175,7 @@ def verify_email(token: str):
             )
             con.commit()
 
-        return "<h3><Email successfully verified.</h3>"
+        return "<h3>Email successfully verified.</h3>"
     finally:
         con.close()
 
