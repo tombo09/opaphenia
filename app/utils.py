@@ -186,7 +186,7 @@ def push_on_chain(hash):
         "nonce": nonce,
         "to": ADDR,
         "value": 0,
-        "data": CALLDATA,
+        "data": hash,
         "gas": gas,
         "maxFeePerGas": max_fee,
         "maxPriorityFeePerGas": priority,
