@@ -173,7 +173,7 @@
     border-radius: 999px;
     padding: 13px 22px;
     background: #111;
-    color: #fff;
+    color: #00000;
     font-weight: 800;
     text-decoration: none;
     box-shadow: 5px 5px 0 #777;
@@ -182,6 +182,9 @@
   .githubBtn:hover {
     transform: translate(1px, 1px);
     box-shadow: 4px 4px 0 #777;
+  }
+  .githubBtn:visited {
+    color: #fff 
   }
 
   .homeInfoGrid {
@@ -230,7 +233,10 @@
 *::after {
   box-sizing: border-box;
 }
-
+.button,
+.button:visited {
+  color: #fff;
+}
 html,
 body {
   max-width: 100%;
@@ -576,7 +582,7 @@ body {
 
       <div class="thoughtUserMock">@ada</div>
 
-      <div class="proofThoughtText">write it before it disappears.</div>
+      <div class="proofThoughtText">write to keep the truth.</div>
 
       <div class="thoughtBoxBottom">
         <span class="pushThoughtBtnMock">pushed!</span>
@@ -596,7 +602,7 @@ body {
         </div>
 
         <div class="detailContentMock">
-          write it before it disappears.
+          write to keep the truth.
         </div>
 
         <div class="proofMetaMock">
@@ -617,27 +623,27 @@ body {
     </div>
 
   </div>
-</div>      <div class="heroActions">
-        <a class="githubBtn" href="https://github.com/" target="_blank" rel="noopener noreferrer">
-          GitHub
-        </a>
-      </div>
-
+</div>      
       <div class="homeInfoGrid">
         <div class="homeInfoBox">
           <h3>write</h3>
-          <p>Save short text entries in a clean, focused interface.</p>
+          <p>1. write strings for documenting, sharing thoughts, telling kids, proofing...</p>
         </div>
 
         <div class="homeInfoBox">
-          <h3>share</h3>
-          <p>2.your strings get a hash and is pushed on chain</p>
+          <h3>push</h3>
+          <p>2. your strings get a hash and is pushed on the ethereum blockchain</p>
         </div>
 
         <div class="homeInfoBox">
           <h3>prove</h3>
           <p>3. proof that you wrote the string at this time.</p>
         </div>
+      </div>
+<div class="heroActions">
+        <a class="githubBtn" href="https://github.com/" target="_blank" rel="noopener noreferrer">
+          GitHub
+        </a>
       </div>
 
     </div>
