@@ -6,7 +6,7 @@ from fastapi.responses import HTMLResponse
 
 from app.limiter import limiter
 from app.turnstile import verify_turnstile_token
-from app.rate_limit import assert_rate_limit, normalize_email
+from app.rate_limit import assert_rate_limit, normalize_email, assert_global_daily_signup_limit
 
 from app.config import (
     APP_BASE_URL,
@@ -47,7 +47,9 @@ async def signup(request:Request, payload: SignupIn):
     # 1. Honeypot: normale Nutzer füllen das nicht aus
     if payload.website:
         raise HTTPException(status_code=400, detail="Ungültige Anfrage")
-
+    
+    assert_global_signup_limit()
+    
     email = normalize_email(payload.email)
     username = payload.username.strip()
 

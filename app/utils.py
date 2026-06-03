@@ -113,7 +113,7 @@ def execute_ts(hash):
     base_fee = int(latest["baseFeePerGas"], 16)
 
     prio_hex = rpc_call("eth_maxPriorityFeePerGas", [])
-    priority = 5 * 10**6  # 2 gwei
+    priority = 5 * 10**6  
     max_fee = base_fee + 2 * priority
 
     # 4) Gas limit schätzen
