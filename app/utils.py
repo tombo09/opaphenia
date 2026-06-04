@@ -90,15 +90,31 @@ def get_time(tx_hash, wait=True, timeout=120, poll_interval=3):
 def get_input(ts_hash):
     return rpc_call("eth_getTransactionByHash", [ts_hash])["input"]
 
-
 def rpc_call(method, params):
-    r = requests.post(RPC, json = {"jsonrpc": "2.0","id": 1,"method": method,"params": params}, timeout=30)
-    r.raise_for_status()
-    data = r.json()
-    if "error" in data:
-        raise RuntimeError(data["error"])
-    return data["result"]
+    payload = {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": method,
+        "params": params,
+    }
 
+    r = requests.post(RPC, json=payload, timeout=30)
+    r.raise_for_status()
+
+    try:
+        data = r.json()
+    except ValueError:
+        raise RuntimeError(f"RPC returned non-JSON response: {r.text}")
+
+    print("RPC response:", data)  # zum Debuggen
+
+    if "error" in data:
+        raise RuntimeError(f"RPC error in {method}: {data['error']}")
+
+    if "result" not in data:
+        raise RuntimeError(f"RPC response has no result field: {data}")
+
+    return data["result"]
 def execute_ts(hash):
     # 1) chainId (Mainnet = 1)
     chain_id = int(rpc_call("eth_chainId", []), 16)
