@@ -72,11 +72,11 @@ export function showOnly(viewEl) {
           className: "typingPos1",
         },
         { username: "@lisa, 1.02.2025 19:06:39",
-          text: "this is not for fast pace typing aka doing more typo then content.",
+          text: "this is not for fast pace typing aka doing more typos then content.",
           className: "typingPos2",
         },
         { username: "@jack_tree, 09.04.2017 18:48:01 ",
-          text: "This page runs as a open source project on github. So it runs as long as some people believe in it!",
+          text: "This page is an open source project on github. So it runs as long as some people believe in it!",
           className: "typingPos3",
         },
 

@@ -5,7 +5,7 @@ import { escapeHtml, formatCreatedAt, getFromQuery, normalizeText, splitPrefixAn
 import { closePostModal, resetSaveButton, setSaveBtnState, showMsg, showOnly } from "./ui.js";
 import { renderDetailError, renderThoughtDetail } from "./detail.js";
 
-export const MAX_STRING_LENGTH = 500;
+export const MAX_STRING_LENGTH = 50000;
 
 export function initThoughtEvents() {
   if (stringInput) {
