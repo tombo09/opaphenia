@@ -7,8 +7,8 @@ from app.moderation import moderate_text
 
 router = APIRouter(tags=["thoughts"])
 
-MAX_THOUGHT_LENGTH = 500
-MAX_THOUGHTS_PER_DAY = 80
+MAX_THOUGHT_LENGTH = 50000
+MAX_THOUGHTS_PER_DAY = 2
 
 @router.post("/thoughts")
 def create_thought(payload: ThoughtIn, user_id: int = Depends(get_current_user_id)):

@@ -36,8 +36,8 @@ def to_sqlite_dt(dt: datetime) -> str:
 def execute_string(string, username):
     content = normalize_text(with_prefix(string, username))
     hashed_content = hash_string(string, username)
-    txid = push_on_chain(hashed_content)
-    #txid = "0x8df388d1b8ec14a7e186e436ee4b68463ae6dc31f40afb3b9b6ee3244a66a926"
+    #txid = push_on_chain(hashed_content)
+    txid = "0x8df388d1b8ec14a7e186e436ee4b68463ae6dc31f40afb3b9b6ee3244a66a926"
     return content, hashed_content, txid
 
 version = 1
