@@ -71,7 +71,7 @@ def assert_rate_limit(scope: str, key: str, max_events: int, window_seconds: int
 
 
 
-def assert_global_signup_limit():
+def assert_global_daily_signup_limit():
     today = str(date.today())
 
     with _signup_lock:

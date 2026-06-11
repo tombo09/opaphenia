@@ -48,7 +48,7 @@ async def signup(request:Request, payload: SignupIn):
     if payload.website:
         raise HTTPException(status_code=400, detail="Ungültige Anfrage")
     
-    assert_global_signup_limit()
+    assert_global_daily_signup_limit()
     
     email = normalize_email(payload.email)
     username = payload.username.strip()
