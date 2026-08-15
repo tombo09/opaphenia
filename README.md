@@ -20,7 +20,6 @@ All written strings are displayed inside the user’s account. By clicking on a 
 * the transaction ID,
 * and a direct Etherscan link to the transaction on the blockchain.
 
-The application persists transaction state so interrupted broadcasts can be recovered without creating unnecessary new transactions.
 ```
 ## How it works
 ```text
