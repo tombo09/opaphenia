@@ -11,7 +11,7 @@ After registration, they can write strings, for example thoughts, ideas, predict
 Each string is combined with the username and the hash algorithm version used at that time. This combined string is then hashed.
 
 The resulting hash is attached as input data to an Ethereum transaction from Address A to Address A.
- Since no ETH is transferred to another party, the only direct cost is the gas fee.
+Since no ETH is transferred to another party, the only direct cost is the gas fee.
 
 All written strings are displayed inside the user’s account. By clicking on a string, the user can view its details, including:
 
