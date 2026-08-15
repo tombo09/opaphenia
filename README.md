@@ -29,8 +29,10 @@ source .venv/bin/activate
 Install the dependencies:
 ```bash
 pip install -r requirements.txt
+```
 Create a .env file and configure the required database, application, Ethereum and external-service environment variables.
 Run the database migrations, then start the application:
+```bash
 uvicorn app.main:app --reload
 ```
 
