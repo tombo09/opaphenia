@@ -31,6 +31,10 @@ Install the dependencies:
 pip install -r requirements.txt
 ```
 Create a .env file and configure the required database, application, Ethereum and external-service environment variables.
+```bash
+cp .env.example .env
+# Edit .env with your configuration
+```
 Run the database migrations, then start the application:
 ```bash
 uvicorn app.main:app --reload
