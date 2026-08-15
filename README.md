@@ -1,5 +1,5 @@
 ## [opaphenia.com](https://www.opaphenia.com)
-The project is explained in more detail [opaphenia.com/tombo09/04](https://www.opaphenia.com/tombo09/04)
+The project is explained in more detail on [opaphenia.com/tombo09/04](https://www.opaphenia.com/tombo09/04)
 
 
 ## Project Concept
