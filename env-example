@@ -1,0 +1,36 @@
+# --- App / URLs ---
+APP_BASE_URL=http://127.0.0.1:8000
+APP_ENV=development
+
+# --- Database ---
+DATABASE_URL=postgresql://postgres@127.0.0.1:5432/opaphenia
+
+# --- JWT ---
+SECRET_KEY=CHANGE_ME_TO_A_LONG_RANDOM_SECRET
+ACCESS_TOKEN_EXPIRE_MINUTES=60
+COOKIE_NAME=access_token
+
+# --- Cookies ---
+COOKIE_SECURE=0
+COOKIE_SAMESITE=lax
+
+# --- CORS ---
+CORS_ORIGINS=http://127.0.0.1:8000,http://localhost:8000
+
+# --- OpenAI ---
+OPENAI_API_KEY=
+
+# --- Ethereum ---
+ETH_PK= # Leave empty unless testing real Ethereum delivery.
+ETH_WALLET_ADDRESS=
+ETH_CONFIRMATIONS=12
+MAX_STRING_FEE_ETH=0.00005
+
+# --- Cloudflare Turnstile ---
+TURNSTILE_SECRET_KEY=
+
+# --- SMTP ---
+SMTP_HOST=smtp.porkbun.com
+SMTP_PORT=587
+SMTP_USER=
+SMTP_PASS=
