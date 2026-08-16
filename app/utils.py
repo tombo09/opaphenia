@@ -7,14 +7,35 @@ import hashlib
 import unicodedata
 from eth_account import Account
 import os
+import re
 import time
+from dataclasses import dataclass
 
-PK = os.getenv("ETH_PK")
-if not PK:
-    raise RuntimeError("ETH_PK is missing")
 
-acct = Account.from_key(PK)
-ADDR = acct.address
+class EthereumConfigurationError(RuntimeError):
+    """A safe, user-facing error for unavailable signing configuration."""
+
+
+@dataclass(frozen=True)
+class EthereumSigner:
+    account: object
+    address: str
+
+
+def get_ethereum_signer() -> EthereumSigner:
+    """Load and validate the Ethereum signer only when signing is required."""
+    private_key = os.getenv("ETH_PK")
+    if not private_key:
+        raise EthereumConfigurationError(
+            "Ethereum signing is unavailable: ETH_PK is not configured"
+        )
+    try:
+        account = Account.from_key(private_key)
+    except Exception:
+        raise EthereumConfigurationError(
+            "Ethereum signing is unavailable: ETH_PK is invalid"
+        ) from None
+    return EthereumSigner(account=account, address=account.address)
 
 # dein Hash als calldata
 CALLDATA = "0x149d5ebb64ea3a7239566ff579699045b92d2866b6e6edf256223827f5b2ae7d"
@@ -34,11 +55,7 @@ def to_sqlite_dt(dt: datetime) -> str:
 
 
 def execute_string(string, username):
-    content = normalize_text(with_prefix(string, username))
-    hashed_content = hash_string(string, username)
-    txid = push_on_chain(hashed_content)
-    #txid = "0x8df388d1b8ec14a7e186e436ee4b68463ae6dc31f40afb3b9b6ee3244a66a926"
-    return content, hashed_content, txid
+    raise RuntimeError("Direct Ethereum sends are disabled; use thought delivery")
 
 version = 1
 def with_prefix(text: str, username) -> str:
@@ -90,6 +107,45 @@ def get_time(tx_hash, wait=True, timeout=120, poll_interval=3):
 def get_input(ts_hash):
     return rpc_call("eth_getTransactionByHash", [ts_hash])["input"]
 
+
+_LONG_HEX_RE = re.compile(r"0x[0-9a-fA-F]{16,}")
+
+
+def sanitize_rpc_text(value, sensitive_values=()) -> str:
+    text = str(value or "")
+    for sensitive in sensitive_values:
+        if sensitive:
+            text = text.replace(str(sensitive), "[redacted]")
+    text = _LONG_HEX_RE.sub("[redacted-hex]", text)
+    text = " ".join(text.split())
+    return text[:240]
+
+
+class RPCError(RuntimeError):
+    def __init__(self, method, *, http_status=None, code=None, message=None):
+        self.method = sanitize_rpc_text(method)
+        self.http_status = http_status
+        self.code = sanitize_rpc_text(code) if code is not None else None
+        self.rpc_message = sanitize_rpc_text(message or "RPC request failed")
+        parts = [f"RPC method={self.method}"]
+        if self.http_status is not None:
+            parts.append(f"http_status={self.http_status}")
+        if self.code is not None:
+            parts.append(f"code={self.code}")
+        parts.append(f"message={self.rpc_message}")
+        super().__init__(" ".join(parts))
+
+
+def _rpc_error_fields(data, params):
+    error = data.get("error") if isinstance(data, dict) else None
+    if not isinstance(error, dict):
+        return None, "RPC request failed"
+    return (
+        error.get("code"),
+        sanitize_rpc_text(error.get("message"), sensitive_values=params),
+    )
+
+
 def rpc_call(method, params):
     payload = {
         "jsonrpc": "2.0",
@@ -98,124 +154,59 @@ def rpc_call(method, params):
         "params": params,
     }
 
-    r = requests.post(RPC, json=payload, timeout=30)
-    r.raise_for_status()
+    try:
+        r = requests.post(RPC, json=payload, timeout=30)
+    except requests.RequestException:
+        raise RPCError(method, message="transport failure") from None
 
     try:
         data = r.json()
     except ValueError:
-        raise RuntimeError(f"RPC returned non-JSON response: {r.text}")
+        data = None
 
-    print("RPC response:", data)  # zum Debuggen
+    if not r.ok:
+        code, message = _rpc_error_fields(data, params)
+        raise RPCError(
+            method,
+            http_status=r.status_code,
+            code=code,
+            message=message if data is not None else "non-JSON HTTP error",
+        ) from None
+
+    if data is None:
+        raise RPCError(
+            method,
+            http_status=r.status_code,
+            message="non-JSON RPC response",
+        ) from None
 
     if "error" in data:
-        raise RuntimeError(f"RPC error in {method}: {data['error']}")
+        code, message = _rpc_error_fields(data, params)
+        raise RPCError(
+            method,
+            http_status=r.status_code,
+            code=code,
+            message=message,
+        ) from None
 
     if "result" not in data:
-        raise RuntimeError(f"RPC response has no result field: {data}")
+        raise RPCError(
+            method,
+            http_status=r.status_code,
+            message="RPC response missing result",
+        ) from None
 
     return data["result"]
+
+
 def execute_ts(hash):
-    # 1) chainId (Mainnet = 1)
-    chain_id = int(rpc_call("eth_chainId", []), 16)
-    if chain_id != 1:
-        raise RuntimeError(f"not Mainnet (chainId={chain_id})")
-
-    # 2) nonce (pending)
-    nonce = int(rpc_call("eth_getTransactionCount", [ADDR, "pending"]), 16)
-
-    # 3) Gas-Fees (EIP-1559)
-    latest = rpc_call("eth_getBlockByNumber", ["latest", False])
-    base_fee = int(latest["baseFeePerGas"], 16)
-
-    prio_hex = rpc_call("eth_maxPriorityFeePerGas", [])
-    priority = 5 * 10**6  
-    max_fee = base_fee + 2 * priority
-
-    # 4) Gas limit schätzen
-    tx_for_estimate = {
-        "from": ADDR,
-        "to": ADDR,
-        "value": hex(0),
-        "data": CALLDATA,
-        "maxFeePerGas": hex(max_fee),
-        "maxPriorityFeePerGas": hex(priority),
-    }
-    gas = int(rpc_call("eth_estimateGas", [tx_for_estimate]), 16)
-
-
-    # 5) Type-2 TX bauen und signieren
-    tx = {
-        "type": 2,
-        "chainId": chain_id,
-        "nonce": nonce,
-        "to": ADDR,
-        "value": 0,
-        "data": CALLDATA,
-        "gas": gas,
-        "maxFeePerGas": max_fee,
-        "maxPriorityFeePerGas": priority,
-    }
-
-    signed = acct.sign_transaction(tx)
-    raw = signed.rawTransaction.hex()
-
-    # 6) Broadcast
-    tx_hash = rpc_call("eth_sendRawTransaction", ["0x" + raw if not raw.startswith("0x") else raw])
-    return ADDR, tx_hash
+    raise RuntimeError("Direct Ethereum sends are disabled; use thought delivery")
 
 
 
 def push_on_chain(hash):
-    # 1) chainId (Mainnet = 1)
-    chain_id = int(rpc_call("eth_chainId", []), 16)
-    if chain_id != 1:
-        raise RuntimeError(f"not Mainnet (chainId={chain_id})")
-
-    # 2) nonce (pending)
-    nonce = int(rpc_call("eth_getTransactionCount", [ADDR, "pending"]), 16)
-
-    # 3) Gas-Fees (EIP-1559)
-    latest = rpc_call("eth_getBlockByNumber", ["latest", False])
-    base_fee = int(latest["baseFeePerGas"], 16)
-
-    prio_hex = rpc_call("eth_maxPriorityFeePerGas", [])
-    priority = 2 * 10**8  
-    max_fee = base_fee + 2 * priority
-
-    # 4) Gas limit schätzen
-    tx_for_estimate = {
-        "from": ADDR,
-        "to": ADDR,
-        "value": hex(0),
-        "data": hash,
-        "maxFeePerGas": hex(max_fee),
-        "maxPriorityFeePerGas": hex(priority),
-    }
-    gas = int(rpc_call("eth_estimateGas", [tx_for_estimate]), 16)
-
-
-    # 5) Type-2 TX bauen und signieren
-    tx = {
-        "type": 2,
-        "chainId": chain_id,
-        "nonce": nonce,
-        "to": ADDR,
-        "value": 0,
-        "data": hash,
-        "gas": gas,
-        "maxFeePerGas": max_fee,
-        "maxPriorityFeePerGas": priority,
-    }
-
-    signed = acct.sign_transaction(tx)
-    raw = signed.raw_transaction.hex()
-
-    # 6) Broadcast
-    tx_hash = rpc_call("eth_sendRawTransaction", ["0x" + raw if not raw.startswith("0x") else raw])
-    return tx_hash
+    raise RuntimeError("Direct Ethereum sends are disabled; use thought delivery")
 
 
 def etherscan_link(txid):
     return f"https://www.etherscan.io/tx/{txid}"
-

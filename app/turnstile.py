@@ -2,6 +2,7 @@ import httpx
 from fastapi import HTTPException, Request
 
 from app.config import TURNSTILE_SECRET_KEY
+from app.limiter import get_client_ip
 
 
 TURNSTILE_VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
@@ -11,12 +12,7 @@ async def verify_turnstile_token(token: str, request: Request) -> None:
     if not token:
         raise HTTPException(status_code=400, detail="Turnstile token fehlt")
 
-    # IP optional mitsenden. Bei Cloudflare ist CF-Connecting-IP am besten.
-    remote_ip = (
-        request.headers.get("CF-Connecting-IP")
-        or request.headers.get("X-Forwarded-For", "").split(",")[0].strip()
-        or (request.client.host if request.client else None)
-    )
+    remote_ip = get_client_ip(request)
 
     data = {
         "secret": TURNSTILE_SECRET_KEY,

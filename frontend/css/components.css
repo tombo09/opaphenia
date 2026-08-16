@@ -329,3 +329,149 @@
   border-top: 1px solid #ddd;
   margin: 18px 0;
 }
+
+.wallet-drawer {
+    position: fixed;
+    left: 16px;
+    bottom: 16px;
+    z-index: 1000;
+
+    font-size: 13px;
+}
+
+.wallet-drawer.hidden {
+    display: none;
+}
+
+.wallet-drawer-panel {
+    position: absolute;
+
+    left: 0;
+    bottom: calc(100% + 8px);
+
+    width: 380px;
+    padding: 14px;
+
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+
+    display: none;
+}
+
+.wallet-drawer.open .wallet-drawer-panel {
+    display: block;
+}
+
+.wallet-drawer.open .wallet-drawer-panel {
+    display: block;
+}
+
+.wallet-drawer-toggle {
+    appearance: none;
+
+    width: 32px;
+    height: 32px;
+    margin-right: 6px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #111;
+    border-radius: 999px;
+
+    background: #111;
+    color: #fff;
+
+    cursor: pointer;
+
+    font-family: Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1;
+
+    transition:
+        background 0.15s ease,
+        color 0.15s ease,
+        border-color 0.15s ease,
+        transform 0.15s ease;
+}
+
+.wallet-drawer-toggle:hover {
+    background: #fff;
+    color: #111;
+    border-color: #111;
+}
+
+.wallet-drawer-toggle:active {
+    transform: translateY(1px);
+}
+
+
+
+.wallet-drawer-title {
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.wallet-stat {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+
+    margin-bottom: 7px;
+}
+
+.wallet-stat span {
+    color: #777;
+}
+
+.wallet-stat strong {
+    font-weight: 500;
+}
+
+.wallet-links {
+    display: flex;
+    gap: 12px;
+
+    margin-top: 12px;
+    padding-top: 10px;
+
+    border-top: 1px solid #eee;
+}
+
+.wallet-links a {
+    color: inherit;
+    text-decoration: underline;
+}
+
+.wallet-drawer-toggle {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+}
+
+.wallet-arrow {
+    display: block;
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 1;
+
+    transform: translateY(-1px);
+    transition: transform 0.15s ease;
+}
+
+.wallet-drawer.open .wallet-arrow {
+    transform: translateY(-1px) rotate(180deg);
+}
+
+

@@ -3,9 +3,33 @@ import { state } from "./state.js";
 import { stringsList, stringInput, saveBtn, stringCounter, searchResults, searchView } from "./dom.js";
 import { escapeHtml, formatCreatedAt, getFromQuery, normalizeText, splitPrefixAndBody } from "./utils.js";
 import { closePostModal, resetSaveButton, setSaveBtnState, showMsg, showOnly } from "./ui.js";
-import { renderDetailError, renderThoughtDetail } from "./detail.js";
+import { renderDetailError, renderThoughtDetail, updateThoughtDetail } from "./detail.js";
 
 export const MAX_STRING_LENGTH = 50000;
+const PENDING_THOUGHT_KEY = "pending-thought-submission";
+const OWNER_POLL_INTERVAL_MS = 4000;
+const TERMINAL_STATUSES = new Set(["mined", "reverted", "failed"]);
+let ownerPollGeneration = 0;
+let ownerPollTimer = null;
+
+export function stopOwnThoughtPolling() {
+  ownerPollGeneration += 1;
+  if (ownerPollTimer !== null) clearTimeout(ownerPollTimer);
+  ownerPollTimer = null;
+}
+
+function getIdempotencyKey(content) {
+  try {
+    const pending = JSON.parse(localStorage.getItem(PENDING_THOUGHT_KEY));
+    if (pending?.content === content && pending?.key) return pending.key;
+  } catch {
+    localStorage.removeItem(PENDING_THOUGHT_KEY);
+  }
+
+  const key = crypto.randomUUID();
+  localStorage.setItem(PENDING_THOUGHT_KEY, JSON.stringify({ content, key }));
+  return key;
+}
 
 export function initThoughtEvents() {
   if (stringInput) {
@@ -20,14 +44,8 @@ export function initThoughtEvents() {
     const item = e.target.closest(".ownStringItem");
     if (!item) return;
 
-    const username = state.currentUsername;
-    if (!username) {
-      showMsg("The username could not be loaded.", 3000);
-      return;
-    }
-
     const stringId = item.dataset.stringId;
-    window.location.href = `/${encodeURIComponent(username)}/${encodeURIComponent(stringId)}?from=overview`;
+    window.location.href = `/own/thoughts/${encodeURIComponent(stringId)}?from=overview`;
   });
 }
 
@@ -80,11 +98,14 @@ async function saveThought(e) {
   setSaveBtnState("loading");
 
   try {
+    const idempotencyKey = getIdempotencyKey(content);
     await apiFetch("/api/thoughts", {
       method: "POST",
+      headers: { "Idempotency-Key": idempotencyKey },
       body: JSON.stringify({ content }),
     });
 
+    localStorage.removeItem(PENDING_THOUGHT_KEY);
     setSaveBtnState("success");
     showMsg(`saved!`, 3000);
     stringInput.value = "";
@@ -100,20 +121,61 @@ async function saveThought(e) {
 }
 
 export async function loadOwnThoughtDetail(thoughtId) {
+  stopOwnThoughtPolling();
+  const generation = ownerPollGeneration;
+  await loadAndRenderOwnThought(thoughtId, generation, true);
+}
+
+async function loadAndRenderOwnThought(thoughtId, generation, initial = false) {
   try {
     const data = await apiFetch(`/api/thoughts/${encodeURIComponent(thoughtId)}`);
 
-    showOnly(searchView);
-    searchResults.innerHTML = "";
+    if (generation !== ownerPollGeneration) return;
 
-    const ownUsername = data.username || state.currentUsername || "";
-    const from = getFromQuery();
-    const backHref = from === "overview" ? "/?view=overview" : `/${encodeURIComponent(ownUsername)}`;
+    if (initial) {
+      showOnly(searchView);
+      searchResults.innerHTML = "";
+      const ownUsername = data.username || state.currentUsername || "";
+      const from = getFromQuery();
+      const backHref = from === "overview" ? "/?view=overview" : `/${encodeURIComponent(ownUsername)}`;
+      renderThoughtDetail(data, ownUsername, backHref);
+    } else {
+      updateThoughtDetail(data);
+    }
 
-    renderThoughtDetail(data, ownUsername, backHref);
+    if (!TERMINAL_STATUSES.has(data.status)) {
+      ownerPollTimer = setTimeout(async () => {
+        if (generation !== ownerPollGeneration) return;
+        if (document.hidden) {
+          await loadAndRenderOwnThoughtWhenVisible(thoughtId, generation);
+          return;
+        }
+        await loadAndRenderOwnThought(thoughtId, generation);
+      }, OWNER_POLL_INTERVAL_MS);
+    }
   } catch (err) {
-    showOnly(searchView);
-    searchResults.innerHTML = "";
-    renderDetailError(err.message);
+    if (generation !== ownerPollGeneration) return;
+    if (initial) {
+      showOnly(searchView);
+      searchResults.innerHTML = "";
+      renderDetailError(err.message);
+      return;
+    }
+    ownerPollTimer = setTimeout(
+      () => loadAndRenderOwnThought(thoughtId, generation),
+      OWNER_POLL_INTERVAL_MS,
+    );
   }
+}
+
+async function loadAndRenderOwnThoughtWhenVisible(thoughtId, generation) {
+  if (generation !== ownerPollGeneration) return;
+  if (document.hidden) {
+    ownerPollTimer = setTimeout(
+      () => loadAndRenderOwnThoughtWhenVisible(thoughtId, generation),
+      OWNER_POLL_INTERVAL_MS,
+    );
+    return;
+  }
+  await loadAndRenderOwnThought(thoughtId, generation);
 }

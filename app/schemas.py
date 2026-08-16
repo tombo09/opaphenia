@@ -22,6 +22,7 @@ class SignupIn(BaseModel):
 
 class EmailUpdateIn(BaseModel):
     email: EmailStr
+    current_password: str
 
 
 class ThoughtIn(BaseModel):

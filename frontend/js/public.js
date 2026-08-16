@@ -66,7 +66,7 @@ export async function runSearch() {
   searchResults.innerHTML = data.items
     .map(
       (u) => `
-        <button class="accItem" data-user-id="${u.id}" data-username="${u.username}" type="button">
+        <button class="accItem" data-user-id="${u.id}" data-username="${escapeHtml(u.username)}" type="button">
           ${escapeHtml(u.username)}
         </button>
       `
@@ -110,7 +110,7 @@ export async function loadPublicThoughtsByUsername(username) {
               .map((t) => {
                 const parts = splitPrefixAndBody(t.content);
                 return `
-                  <div class="stringItem" data-string-id="${t.id}" data-username="${data.user.username}">
+                  <div class="stringItem" data-string-id="${t.id}" data-username="${escapeHtml(data.user.username)}">
                     <div class="stringItemDate">${escapeHtml(formatCreatedAt(t.created_at))}</div>
                     <div class="stringItemContent">${escapeHtml(parts.body)}</div>
                   </div>

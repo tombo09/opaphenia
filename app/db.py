@@ -19,6 +19,7 @@ def init_db():
       email_verified BOOLEAN NOT NULL DEFAULT FALSE,
       strings_public BOOLEAN NOT NULL DEFAULT FALSE,
       failed_attempts INT NOT NULL DEFAULT 0,
+      auth_version BIGINT NOT NULL DEFAULT 1,
       timezone TEXT NOT NULL DEFAULT 'Europe/Berlin'
     );
 

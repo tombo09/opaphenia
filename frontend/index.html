@@ -717,6 +717,7 @@ body {
 
     <h4>Email</h4>
     <input id="accountEmail" type="email" readonly />
+    <input id="emailChangeCurrentPassword" type="password" placeholder="current password" />
     <div class="btnRow">
       <button id="saveEmailBtn" class="btn" style="display:none;">Save</button>
       <button id="cancelEmailBtn" class="btn" style="display:none;">Cancel</button>
@@ -797,5 +798,56 @@ body {
   defer>
 </script>
 <script type="module" src="/js/app.js"></script>
+<div id="wallet-drawer" class="wallet-drawer hidden">
+
+    <button
+        id="wallet-drawer-toggle"
+        class="btn wallet-drawer-toggle"
+        aria-label="Open network information"
+        type="button"
+    >
+        <span class="wallet-arrow">›</span>
+    </button>
+
+    <div class="wallet-drawer-panel">
+        <div class="wallet-drawer-title">General</div>
+
+        <div class="wallet-stat">
+            <span>ETH-Wallet address</span>
+            <strong id="wallet-address">—</strong>
+        </div>
+
+        <div class="wallet-stat">
+            <span>Wallet balance</span>
+            <strong id="wallet-balance">— ETH</strong>
+        </div>
+
+        <div class="wallet-stat">
+            <span>Available strings</span>
+            <strong id="wallet-strings">—</strong>
+        </div>
+
+        <div class="wallet-links">
+            <a
+                id="wallet-etherscan"
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                Etherscan
+            </a>
+
+            <a href="/DEIN_ZWEITER_LINK">
+                github
+            </a>
+	    <a href = "https://www.opaphenia.com/tombo09/4">
+		    project concept
+	    </a>
+        </div>
+    </div>
+
+</div>
+
+
 </body>
 </html>

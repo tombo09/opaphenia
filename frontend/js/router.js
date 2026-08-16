@@ -14,6 +14,10 @@ export function parseRoute() {
     return { type: "settings" };
   }
 
+  if (parts.length === 3 && parts[0] === "own" && parts[1] === "thoughts") {
+    return { type: "own-thought", thoughtId: decodeURIComponent(parts[2]) };
+  }
+
   if (parts.length === 1) {
     return { type: "user", username: decodeURIComponent(parts[0]) };
   }

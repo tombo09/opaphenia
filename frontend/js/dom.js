@@ -37,6 +37,7 @@ export const postModalOverlay = document.getElementById("postModalOverlay");
 export const closePostModalBtn = document.getElementById("closePostModalBtn");
 
 export const accountEmail = document.getElementById("accountEmail");
+export const emailChangeCurrentPassword = document.getElementById("emailChangeCurrentPassword");
 export const accountUsernameEl = document.getElementById("accountUsername");
 export const saveEmailBtn = document.getElementById("saveEmailBtn");
 export const cancelEmailBtn = document.getElementById("cancelEmailBtn");
@@ -55,8 +56,23 @@ export const proofHashCodeBox = document.getElementById("proofHashCodeBox");
 export const closeProofHashModalBtn = document.getElementById("closeProofHashModalBtn");
 
 export const msg = document.getElementById("msgToast");
+export const walletDrawer =
+  document.getElementById("wallet-drawer");
 
+export const walletDrawerToggle =
+  document.getElementById("wallet-drawer-toggle");
 
+export const walletBalance =
+  document.getElementById("wallet-balance");
+
+export const walletStrings =
+  document.getElementById("wallet-strings");
+
+export const walletAddress =
+  document.getElementById("wallet-address");
+
+export const walletEtherscan =
+  document.getElementById("wallet-etherscan");
 
 export const views = [
   homeView,

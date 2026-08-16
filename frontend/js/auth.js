@@ -32,17 +32,14 @@ function renderSignupTurnstile() {
     theme: "light",
 
     callback(token) {
-      console.log("Turnstile success token:", token);
       turnstileToken = token;
     },
 
     "expired-callback"() {
-      console.log("Turnstile expired");
       turnstileToken = "";
     },
 
     "error-callback"() {
-      console.log("Turnstile error");
       turnstileToken = "";
     },
   });
