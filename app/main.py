@@ -11,7 +11,7 @@ from fastapi.responses import FileResponse
 
 from app.config import CORS_ORIGINS
 from app.db import init_db, connect
-from app.routers import auth, account, thoughts, public
+from app.routers import auth, account, thoughts, public, eth
 from app.limiter import limiter
 
 
@@ -41,6 +41,7 @@ def create_app() -> FastAPI:
     app.include_router(account.router, prefix="/api")
     app.include_router(thoughts.router, prefix="/api")
     app.include_router(public.router, prefix="/api")
+    app.include_router(eth.router, prefix="/api")
 
     # Static directories
     app.mount(

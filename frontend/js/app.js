@@ -14,6 +14,12 @@ import {
   postModalOverlay,
   proofHashModal,
   closeProofHashModalBtn,
+  walletDrawer,
+  walletDrawerToggle,
+  walletBalance,
+  walletStrings,
+  walletAddress,
+  walletEtherscan,
 } from "./dom.js";
 
 import { state } from "./state.js";
@@ -37,20 +43,80 @@ import {
   initPublicEvents,
 } from "./public.js";
 
+let walletLoaded = false;
+
+
+function showWalletDrawer() {
+  walletDrawer?.classList.remove("hidden");
+}
+
+
+function hideWalletDrawer() {
+  walletDrawer?.classList.add("hidden");
+  walletDrawer?.classList.remove("open");
+}
+
+
+async function loadEthStatus() {
+  try {
+    const response = await fetch("/api/eth/status");
+
+    if (!response.ok) {
+      throw new Error("Could not load ETH status");
+    }
+
+    const data = await response.json();
+const address = data.wallet_address;
+
+
+
+walletAddress.textContent = address;
+
+walletEtherscan.href =
+  `https://etherscan.io/address/${address}`;
+    walletBalance.textContent =
+      `${Number(data.balance_eth).toFixed(5)} ETH`;
+
+    walletStrings.textContent =
+      Math.floor(data.possible_strings).toLocaleString();
+
+  } catch (err) {
+    console.error("ETH status:", err);
+
+    walletBalance.textContent = "Unavailable";
+    walletStrings.textContent = "—";
+  }
+}
+
+
 function initGlobalEvents() {
+  walletDrawerToggle?.addEventListener("click", async () => {
+    walletDrawer.classList.toggle("open");
+
+    if (
+      walletDrawer.classList.contains("open") &&
+      !walletLoaded
+    ) {
+      await loadEthStatus();
+      walletLoaded = true;
+    }
+  });
   homeBtn?.addEventListener("click", async () => {
     history.pushState({}, "", "/");
 
     if (await isLoggedIn()) {
+      hideWalletDrawer();
       const ok = await loadAccount();
       showOnly(overviewView);
       await refreshStringsList();
     } else {
       showOnly(homeView);
+      showWalletDrawer();
     }
   });
 
   accountBtn?.addEventListener("click", async () => {
+    hideWalletDrawer();
     if (await isLoggedIn()) {
       history.pushState({}, "", "/settings");
       await initApp();
@@ -92,7 +158,7 @@ function initGlobalEvents() {
 
 export async function initApp() {
   await refreshAuthUI();
-
+  hideWalletDrawer();
   const queryView = getViewFromQuery();
   const route = parseRoute();
   const loggedIn = await isLoggedIn();
@@ -161,6 +227,7 @@ export async function initApp() {
 
   setHomeButtonDisabled(true);
   showOnly(homeView);
+  showWalletDrawer();
 }
 
 initGlobalEvents();
@@ -173,3 +240,8 @@ initApp().catch((err) => {
   console.error(err);
   showMsg("The app could not be loaded.", 3000);
 });
+
+
+
+
+

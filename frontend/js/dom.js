@@ -55,8 +55,23 @@ export const proofHashCodeBox = document.getElementById("proofHashCodeBox");
 export const closeProofHashModalBtn = document.getElementById("closeProofHashModalBtn");
 
 export const msg = document.getElementById("msgToast");
+export const walletDrawer =
+  document.getElementById("wallet-drawer");
 
+export const walletDrawerToggle =
+  document.getElementById("wallet-drawer-toggle");
 
+export const walletBalance =
+  document.getElementById("wallet-balance");
+
+export const walletStrings =
+  document.getElementById("wallet-strings");
+
+export const walletAddress =
+  document.getElementById("wallet-address");
+
+export const walletEtherscan =
+  document.getElementById("wallet-etherscan");
 
 export const views = [
   homeView,
