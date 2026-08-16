@@ -3,6 +3,8 @@ import secrets
 from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException, Response, Form, Request
 from fastapi.responses import HTMLResponse
+from html import escape
+
 
 from app.limiter import limiter
 from app.turnstile import verify_turnstile_token
@@ -304,10 +306,11 @@ def password_reset_request(payload: ResetRequestIn):
 
 @router.get("/reset-password", response_class=HTMLResponse)
 def reset_password_page(token: str):
+    escaped_token = escape(token, quote=True)
     return f"""
     <h3>Reset password</h3>
     <form method="post" action="/api/password-reset/confirm">
-      <input type="hidden" name="token" value="{token}">
+      <input type="hidden" name="token" value="{escaped_token}">
       <input name="new_password" type="password" placeholder="new password" required><br><br>
       <input name="new_password2" type="password" placeholder="repeat new password" required><br><br>
       <button type="submit">Set new password</button>
