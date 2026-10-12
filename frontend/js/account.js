@@ -2,6 +2,7 @@ import { apiFetch } from "./api.js";
 import { state } from "./state.js";
 import {
   accountEmail,
+  emailChangeCurrentPassword,
   accountUsernameEl,
   publicStringsChk,
   saveEmailBtn,
@@ -59,9 +60,13 @@ export function initAccountEvents() {
     try {
       await apiFetch("/api/account/request-email-change", {
         method: "PUT",
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({
+          email,
+          current_password: emailChangeCurrentPassword.value,
+        }),
       });
 
+      emailChangeCurrentPassword.value = "";
       setEmailEditMode(false);
       showMsg("A confirmation link has been sent to your new email address. Please verify it.", 5000);
     } catch (err) {

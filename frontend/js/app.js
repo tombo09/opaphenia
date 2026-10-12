@@ -36,7 +36,12 @@ import {
 
 import { isLoggedIn, refreshAuthUI, initAuthEvents } from "./auth.js";
 import { loadAccount, initAccountEvents } from "./account.js";
-import { refreshStringsList, loadOwnThoughtDetail, initThoughtEvents } from "./thoughts.js";
+import {
+  refreshStringsList,
+  loadOwnThoughtDetail,
+  stopOwnThoughtPolling,
+  initThoughtEvents,
+} from "./thoughts.js";
 import {
   loadPublicThoughtsByUsername,
   loadPublicThoughtDetail,
@@ -157,11 +162,22 @@ function initGlobalEvents() {
 }
 
 export async function initApp() {
+  stopOwnThoughtPolling();
   await refreshAuthUI();
   hideWalletDrawer();
   const queryView = getViewFromQuery();
   const route = parseRoute();
   const loggedIn = await isLoggedIn();
+
+  if (route.type === "own-thought") {
+    if (!loggedIn) {
+      setHomeButtonDisabled(false);
+      showOnly(loginView);
+      return;
+    }
+    await loadOwnThoughtDetail(route.thoughtId);
+    return;
+  }
 
   if (route.type === "settings") {
     if (!loggedIn) {
@@ -240,8 +256,3 @@ initApp().catch((err) => {
   console.error(err);
   showMsg("The app could not be loaded.", 3000);
 });
-
-
-
-
-

@@ -37,6 +37,7 @@ export const postModalOverlay = document.getElementById("postModalOverlay");
 export const closePostModalBtn = document.getElementById("closePostModalBtn");
 
 export const accountEmail = document.getElementById("accountEmail");
+export const emailChangeCurrentPassword = document.getElementById("emailChangeCurrentPassword");
 export const accountUsernameEl = document.getElementById("accountUsername");
 export const saveEmailBtn = document.getElementById("saveEmailBtn");
 export const cancelEmailBtn = document.getElementById("cancelEmailBtn");

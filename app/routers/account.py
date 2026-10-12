@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from ..db import connect
 from ..schemas import EmailUpdateIn, PasswordUpdate, VisibilityUpdate, TimezoneIn
 from ..security import get_current_user_id, verify_password, hash_password
-from ..utils import sha256, now_utc, to_sqlite_dt
+from ..utils import sha256, now_utc
 from ..email_utils import send_email
 from ..config import APP_BASE_URL
 import secrets
@@ -41,26 +41,66 @@ def get_account(user_id: int = Depends(get_current_user_id)):
 def request_email_change(payload: EmailUpdateIn, user_id: int = Depends(get_current_user_id)):
     new_email = payload.email.strip().lower()
 
-    con = connect()
-    cur = con.cursor()
-    cur.execute("SELECT 1 FROM users WHERE email = %s", (new_email,))
-    if cur.fetchone():
-        con.close()
-        raise HTTPException(status_code=409, detail="This email address already exists")
-    con.close()
-
     token = secrets.token_urlsafe(32)
     token_hash = sha256(token)
-    expires = to_sqlite_dt(now_utc() + timedelta(minutes=30))
+    expires = now_utc() + timedelta(minutes=30)
 
     con = connect()
-    cur = con.cursor()
-    cur.execute("""
-        INSERT INTO email_verifications (user_id, purpose, new_email, token_hash, expires_at)
-        VALUES (%s, 'change_email', %s, %s, %s)
-    """, (user_id, new_email, token_hash, expires))
-    con.commit()
-    con.close()
+    try:
+        with con.transaction():
+            with con.cursor() as cur:
+                cur.execute(
+                    """
+                    SELECT password_hash
+                    FROM users
+                    WHERE id = %s
+                    FOR UPDATE
+                    """,
+                    (user_id,),
+                )
+                user = cur.fetchone()
+                if not user:
+                    raise HTTPException(status_code=404, detail="User not found")
+
+                if not verify_password(
+                    payload.current_password,
+                    user["password_hash"],
+                ):
+                    raise HTTPException(
+                        status_code=401,
+                        detail="The current password is incorrect",
+                    )
+
+                cur.execute(
+                    "SELECT 1 FROM users WHERE lower(email) = %s",
+                    (new_email,),
+                )
+                if cur.fetchone():
+                    raise HTTPException(
+                        status_code=409,
+                        detail="This email address already exists",
+                    )
+
+                cur.execute(
+                    """
+                    UPDATE email_verifications
+                    SET used = TRUE
+                    WHERE user_id = %s
+                      AND purpose = 'change_email'
+                      AND used = FALSE
+                    """,
+                    (user_id,),
+                )
+                cur.execute(
+                    """
+                    INSERT INTO email_verifications
+                        (user_id, purpose, new_email, token_hash, expires_at)
+                    VALUES (%s, 'change_email', %s, %s, %s)
+                    """,
+                    (user_id, new_email, token_hash, expires),
+                )
+    finally:
+        con.close()
 
     link = f"{APP_BASE_URL}/api/verify-email?token={token}"
     send_email(new_email, "Confirm your new email", f"Click to confirm: {link}")
@@ -75,22 +115,38 @@ def update_password(payload: PasswordUpdate, user_id: int = Depends(get_current_
         raise HTTPException(status_code=400, detail="New password is too short (min. 8 characters)")
 
     con = connect()
-    cur = con.cursor()
-    cur.execute("SELECT password_hash FROM users WHERE id = %s", (user_id,))
-    row = cur.fetchone()
-    if not row:
-        con.close()
-        raise HTTPException(status_code=404, detail="User not found")
+    try:
+        with con.transaction():
+            with con.cursor() as cur:
+                cur.execute(
+                    "SELECT password_hash FROM users WHERE id = %s",
+                    (user_id,),
+                )
+                row = cur.fetchone()
+                if not row:
+                    raise HTTPException(status_code=404, detail="User not found")
 
-    pw_hash = row[0]
-    if not verify_password(payload.old_password, pw_hash):
-        con.close()
-        raise HTTPException(status_code=401, detail="The old password is incorrect")
+                if not verify_password(
+                    payload.old_password,
+                    row["password_hash"],
+                ):
+                    raise HTTPException(
+                        status_code=401,
+                        detail="The old password is incorrect",
+                    )
 
-    new_hash = hash_password(payload.new_password)
-    cur.execute("UPDATE users SET password_hash = %s WHERE id = %s", (new_hash, user_id))
-    con.commit()
-    con.close()
+                new_hash = hash_password(payload.new_password)
+                cur.execute(
+                    """
+                    UPDATE users
+                    SET password_hash = %s,
+                        auth_version = auth_version + 1
+                    WHERE id = %s
+                    """,
+                    (new_hash, user_id),
+                )
+    finally:
+        con.close()
     return {"ok": True}
 
 @router.put("/account/visibility")

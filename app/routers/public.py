@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from app.db import connect
 from app.utils import etherscan_link
 from app.security import get_current_user_id
+from app.thought_views import owner_delivery_projection
 
 router = APIRouter(tags=["public"])
 
@@ -57,6 +58,7 @@ def public_thoughts_by_user(user_id: int):
                 SELECT id, content, created_at
                 FROM thoughts
                 WHERE user_id = %s
+                  AND published_at IS NOT NULL
                 ORDER BY created_at DESC
                 """,
                 (user_id,),
@@ -99,6 +101,7 @@ def get_public_thought(thought_id: int):
                 FROM thoughts t
                 JOIN users u ON u.id = t.user_id
                 WHERE t.id = %s
+                  AND t.published_at IS NOT NULL
                 """,
                 (thought_id,),
             )
@@ -158,6 +161,7 @@ def public_user_by_username(username: str):
                 SELECT id, content, created_at
                 FROM thoughts
                 WHERE user_id = %s
+                  AND published_at IS NOT NULL
                 ORDER BY created_at DESC
                 """,
                 (user["id"],),
@@ -206,6 +210,7 @@ def public_thought_by_username(username: str, thought_id: int):
                 JOIN users u ON u.id = t.user_id
                 WHERE lower(u.username) = %s
                   AND t.id = %s
+                  AND t.published_at IS NOT NULL
                 """,
                 (username, thought_id),
             )
@@ -247,6 +252,10 @@ def get_own_thought(thought_id: int, user_id: int = Depends(get_current_user_id)
                     t.blocktime,
                     t.hashed_string,
                     t.txid,
+                    t.status,
+                    t.confirmation_count,
+                    t.confirmation_required,
+                    t.published_at,
                     u.username
                 FROM thoughts t
                 JOIN users u ON u.id = t.user_id
@@ -262,6 +271,7 @@ def get_own_thought(thought_id: int, user_id: int = Depends(get_current_user_id)
 
         link = etherscan_link(row["txid"]) if row["txid"] else None
 
+        row["etherscan_link"] = link
         return {
             "id": row["id"],
             "username": row["username"],
@@ -271,6 +281,7 @@ def get_own_thought(thought_id: int, user_id: int = Depends(get_current_user_id)
             "hashed_string": row["hashed_string"],
             "txid": row["txid"],
             "etherscan_link": link,
+            **owner_delivery_projection(row),
         }
     finally:
         con.close()

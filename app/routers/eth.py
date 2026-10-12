@@ -10,7 +10,6 @@ router = APIRouter(tags=["eth"])
 
 
 ETH_WALLET_ADDRESS = os.getenv("ETH_WALLET_ADDRESS")
-
 MAX_STRING_FEE_ETH = Decimal(
     os.getenv("MAX_STRING_FEE_ETH", "0.00005")
 )
@@ -59,7 +58,7 @@ def eth_status():
     )
 
     return {
-    "wallet_address": ETH_WALLET_ADDRESS,
+        "wallet_address": ETH_WALLET_ADDRESS,
         "balance_eth": str(balance_eth),
         "possible_strings": possible_strings,
     }
