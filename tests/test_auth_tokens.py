@@ -52,7 +52,9 @@ class AuthenticationTokenTests(unittest.TestCase):
                         DELETE FROM rate_limit_events
                         WHERE scope IN (
                             'password_reset_email',
-                            'password_reset_ip'
+                            'password_reset_ip',
+                            'verification_resend_identifier',
+                            'verification_resend_ip'
                         )
                         """
                     )
@@ -85,7 +87,9 @@ class AuthenticationTokenTests(unittest.TestCase):
                         DELETE FROM rate_limit_events
                         WHERE scope IN (
                             'password_reset_email',
-                            'password_reset_ip'
+                            'password_reset_ip',
+                            'verification_resend_identifier',
+                            'verification_resend_ip'
                         )
                         """
                     )
@@ -96,6 +100,13 @@ class AuthenticationTokenTests(unittest.TestCase):
         return self.client.post(
             "/api/password-reset/request",
             json={"email": email or self.email},
+            headers=headers,
+        )
+
+    def resend_verification_request(self, login=None, headers=None):
+        return self.client.post(
+            "/api/verification/resend",
+            json={"login": login or self.email},
             headers=headers,
         )
 
@@ -235,6 +246,162 @@ class AuthenticationTokenTests(unittest.TestCase):
         self.assertEqual(rate_limit_failure.status_code, missing.status_code)
         self.assertEqual(rate_limit_failure.json(), missing.json())
         self.assertIn("stage=rate_limit", "\n".join(rate_limit_logs.output))
+
+    def test_expired_signup_verification_can_be_reissued(self):
+        old_token = uuid.uuid4().hex
+        self.insert_verification_token(old_token, expired=True)
+        con = connect()
+        try:
+            with con.transaction():
+                with con.cursor() as cur:
+                    cur.execute(
+                        """
+                        INSERT INTO email_outbox
+                            (user_id, kind, to_email, subject, body)
+                        VALUES (%s, 'signup_verification', %s,
+                                'Verify your email', %s)
+                        """,
+                        (
+                            self.user_id,
+                            self.email,
+                            f"Click to verify: old?token={old_token}",
+                        ),
+                    )
+        finally:
+            con.close()
+
+        response = self.resend_verification_request()
+        self.assertEqual(response.status_code, 200, response.text)
+        self.assertEqual(response.json(), auth.VERIFICATION_RESEND_RESPONSE)
+
+        con = connect()
+        try:
+            with con.cursor() as cur:
+                cur.execute(
+                    """
+                    SELECT token_hash, used, expires_at > now() AS valid
+                    FROM email_verifications
+                    WHERE user_id = %s AND purpose = 'signup'
+                    ORDER BY created_at, id
+                    """,
+                    (self.user_id,),
+                )
+                tokens = cur.fetchall()
+                cur.execute(
+                    """
+                    SELECT status, body
+                    FROM email_outbox
+                    WHERE user_id = %s AND kind = 'signup_verification'
+                    ORDER BY created_at, id
+                    """,
+                    (self.user_id,),
+                )
+                emails = cur.fetchall()
+                cur.execute(
+                    "SELECT email_verified FROM users WHERE id = %s",
+                    (self.user_id,),
+                )
+                account = cur.fetchone()
+        finally:
+            con.close()
+
+        self.assertEqual(len(tokens), 2)
+        self.assertTrue(tokens[0]["used"])
+        self.assertFalse(tokens[1]["used"])
+        self.assertTrue(tokens[1]["valid"])
+        self.assertEqual(emails[0]["status"], "failed")
+        self.assertIsNone(emails[0]["body"])
+        self.assertEqual(emails[1]["status"], "pending")
+        new_token = parse_qs(
+            urlparse(emails[1]["body"].split()[-1]).query
+        )["token"][0]
+        self.assertEqual(tokens[1]["token_hash"], sha256(new_token))
+        self.assertFalse(account["email_verified"])
+        self.assertIn("successfully verified", auth.verify_email(new_token))
+
+    def test_verification_resend_response_does_not_reveal_account_state(self):
+        missing = self.resend_verification_request(
+            f"missing-{uuid.uuid4().hex}"
+        )
+        con = connect()
+        try:
+            with con.transaction():
+                with con.cursor() as cur:
+                    cur.execute(
+                        "UPDATE users SET email_verified = TRUE WHERE id = %s",
+                        (self.user_id,),
+                    )
+        finally:
+            con.close()
+        verified = self.resend_verification_request()
+
+        self.assertEqual(missing.status_code, 200)
+        self.assertEqual(verified.status_code, 200)
+        self.assertEqual(missing.json(), verified.json())
+        self.assertEqual(verified.json(), auth.VERIFICATION_RESEND_RESPONSE)
+
+        con = connect()
+        try:
+            with con.cursor() as cur:
+                cur.execute(
+                    "SELECT count(*) AS count FROM email_outbox WHERE user_id = %s",
+                    (self.user_id,),
+                )
+                queued = cur.fetchone()["count"]
+        finally:
+            con.close()
+        self.assertEqual(queued, 0)
+
+    def test_verification_resend_is_rate_limited_by_identifier(self):
+        missing = f"missing-{uuid.uuid4().hex}"
+        responses = [
+            self.resend_verification_request(missing) for _ in range(4)
+        ]
+        self.assertEqual(
+            [response.status_code for response in responses],
+            [200, 200, 200, 429],
+        )
+
+    def test_concurrent_verification_resends_queue_only_one_email(self):
+        old_token = uuid.uuid4().hex
+        self.insert_verification_token(old_token, expired=True)
+        barrier = threading.Barrier(2)
+
+        def resend():
+            barrier.wait()
+            auth._queue_verification_resend(self.email)
+
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            list(executor.map(lambda _: resend(), range(2)))
+
+        con = connect()
+        try:
+            with con.cursor() as cur:
+                cur.execute(
+                    """
+                    SELECT count(*) FILTER (WHERE used = FALSE) AS active
+                    FROM email_verifications
+                    WHERE user_id = %s AND purpose = 'signup'
+                    """,
+                    (self.user_id,),
+                )
+                active = cur.fetchone()["active"]
+                cur.execute(
+                    """
+                    SELECT count(*) AS count
+                    FROM email_outbox
+                    WHERE user_id = %s
+                      AND kind = 'signup_verification'
+                      AND status = 'pending'
+                    """,
+                    (self.user_id,),
+                )
+                queued = cur.fetchone()["count"]
+        finally:
+            con.close()
+
+        self.assertEqual(active, 1)
+        self.assertEqual(queued, 1)
 
     def test_new_reset_invalidates_old_and_only_one_is_active(self):
         links = []

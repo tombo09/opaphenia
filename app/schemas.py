@@ -20,6 +20,10 @@ class SignupIn(BaseModel):
     website: str | None = None
 
 
+class VerificationResendIn(BaseModel):
+    login: str = Field(min_length=3, max_length=254)
+
+
 class EmailUpdateIn(BaseModel):
     email: EmailStr
     current_password: str

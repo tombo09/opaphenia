@@ -20,6 +20,7 @@ export const loginPasswordInput = document.getElementById("loginPasswordInput");
 export const loginBtn = document.getElementById("loginBtn");
 export const openSignupBtn = document.getElementById("openSignupBtn");
 export const resetPwBtn = document.getElementById("resetPwBtn");
+export const resendVerificationBtn = document.getElementById("resendVerificationBtn");
 
 export const signupEmailInput = document.getElementById("signupEmailInput");
 export const signupUsernameInput = document.getElementById("signupUsernameInput");

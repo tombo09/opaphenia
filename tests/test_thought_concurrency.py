@@ -76,6 +76,7 @@ class ThoughtConcurrencyTests(unittest.TestCase):
 
         with (
             patch.object(thoughts, "moderate_text", return_value={"flagged": False}),
+            patch.object(thoughts, "MAX_THOUGHTS_PER_DAY", 2),
             patch.object(
                 thoughts,
                 "process_thought",

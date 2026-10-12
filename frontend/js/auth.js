@@ -7,6 +7,7 @@ import {
   loginPasswordInput,
   loginBtn,
   resetPwBtn,
+  resendVerificationBtn,
   signupEmailInput,
   signupUsernameInput,
   signupPasswordInput,
@@ -71,8 +72,15 @@ function lockLoginUI(locked) {
   if (resetPwBtn) resetPwBtn.style.display = locked ? "inline-block" : "none";
 }
 
+function showVerificationResend(show) {
+  if (resendVerificationBtn) {
+    resendVerificationBtn.style.display = show ? "inline-block" : "none";
+  }
+}
+
 export function initAuthEvents() {
   openSignupBtn?.addEventListener("click", () => {
+    showVerificationResend(false);
     showOnly(signupView);
     if (signupEmailInput) signupEmailInput.value = "";
     if (signupUsernameInput) signupUsernameInput.value = "";
@@ -87,14 +95,14 @@ export function initAuthEvents() {
   });
 
   backToLoginBtn?.addEventListener("click", () => {
+    showVerificationResend(false);
     showOnly(loginView);
   });
 
   loginBtn?.addEventListener("click", async () => {
     const login = loginInput.value.trim();
     const password = loginPasswordInput.value;
-
-
+    showVerificationResend(false);
 
     try {
       await apiFetch("/api/login", {
@@ -111,6 +119,12 @@ export function initAuthEvents() {
     } catch (err) {
       state.failedLocal += 1;
 
+      if (err.status === 403) {
+        showVerificationResend(true);
+        showMsg(err.message || "Please verify your email address first.", 5000);
+        return;
+      }
+
       if (err.status === 423) {
         lockLoginUI(true);
         showMsg(err.message || "Too many failed attempts. Reset required.", 5000);
@@ -121,6 +135,27 @@ export function initAuthEvents() {
       if (state.failedLocal >= 5 && resetPwBtn) resetPwBtn.style.display = "inline-block";
     }
 
+  });
+
+  resendVerificationBtn?.addEventListener("click", async () => {
+    const login = loginInput.value.trim();
+    if (!login) {
+      showMsg("Please enter your email address or username.", 3000);
+      return;
+    }
+
+    resendVerificationBtn.disabled = true;
+    try {
+      const data = await apiFetch("/api/verification/resend", {
+        method: "POST",
+        body: JSON.stringify({ login }),
+      });
+      showMsg(data.message, 5000);
+    } catch (err) {
+      showMsg(err.message || "The activation link could not be requested.", 3000);
+    } finally {
+      resendVerificationBtn.disabled = false;
+    }
   });
 
   resetPwBtn?.addEventListener("click", async () => {

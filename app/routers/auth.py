@@ -24,7 +24,7 @@ from app.config import (
     ACCESS_TOKEN_EXPIRE_MINUTES,
 )
 from app.db import connect
-from app.schemas import LoginIn, SignupIn, ResetRequestIn
+from app.schemas import LoginIn, SignupIn, ResetRequestIn, VerificationResendIn
 from app.security import (
     create_access_token,
     verify_password,
@@ -41,6 +41,16 @@ logger = logging.getLogger(__name__)
 PASSWORD_RESET_RATE_WINDOW_SECONDS = 60 * 60
 PASSWORD_RESET_EMAIL_MAX = 3
 PASSWORD_RESET_IP_MAX = 10
+VERIFICATION_RESEND_RATE_WINDOW_SECONDS = 60 * 60
+VERIFICATION_RESEND_IDENTIFIER_MAX = 3
+VERIFICATION_RESEND_IP_MAX = 10
+VERIFICATION_RESEND_COOLDOWN_SECONDS = 60
+VERIFICATION_RESEND_RESPONSE = {
+    "ok": True,
+    "message": (
+        "If an unverified account exists, a new activation link has been sent."
+    ),
+}
 
 
 def _persist_signup(email, username, password_hash, token_hash, expires, link):
@@ -79,6 +89,102 @@ def _persist_signup(email, username, password_hash, token_hash, expires, link):
                     user_id=user_id,
                     kind="signup_verification",
                     to_email=email,
+                    subject="Verify your email",
+                    body=f"Click to verify: {link}",
+                )
+    finally:
+        con.close()
+
+
+def _queue_verification_resend(identifier: str) -> None:
+    con = connect()
+    try:
+        with con.transaction():
+            with con.cursor() as cur:
+                cur.execute(
+                    """
+                    SELECT id, email, email_verified
+                    FROM users
+                    WHERE lower(email) = %s
+                    FOR UPDATE
+                    """,
+                    (identifier,),
+                )
+                user = cur.fetchone()
+                if not user:
+                    cur.execute(
+                        """
+                        SELECT id, email, email_verified
+                        FROM users
+                        WHERE lower(username) = %s
+                        FOR UPDATE
+                        """,
+                        (identifier,),
+                    )
+                    user = cur.fetchone()
+
+                if not user or user["email_verified"] is True:
+                    return
+
+                cur.execute(
+                    """
+                    SELECT 1
+                    FROM email_verifications
+                    WHERE user_id = %s
+                      AND purpose = 'signup'
+                      AND used = FALSE
+                      AND expires_at > now()
+                      AND created_at > now() - (
+                          %s * interval '1 second'
+                      )
+                    LIMIT 1
+                    """,
+                    (user["id"], VERIFICATION_RESEND_COOLDOWN_SECONDS),
+                )
+                if cur.fetchone():
+                    return
+
+                cur.execute(
+                    """
+                    UPDATE email_verifications
+                    SET used = TRUE
+                    WHERE user_id = %s
+                      AND purpose = 'signup'
+                      AND used = FALSE
+                    """,
+                    (user["id"],),
+                )
+                cur.execute(
+                    """
+                    UPDATE email_outbox
+                    SET status = 'failed', body = NULL,
+                        last_error = 'Superseded',
+                        claimed_by = NULL, claim_until = NULL,
+                        updated_at = now()
+                    WHERE user_id = %s
+                      AND kind = 'signup_verification'
+                      AND status IN ('pending', 'retry')
+                    """,
+                    (user["id"],),
+                )
+
+                token = secrets.token_urlsafe(32)
+                token_hash = sha256(token)
+                expires = now_utc() + timedelta(minutes=30)
+                link = f"{APP_BASE_URL}/api/verify-email?token={token}"
+                cur.execute(
+                    """
+                    INSERT INTO email_verifications
+                        (user_id, purpose, token_hash, expires_at)
+                    VALUES (%s, 'signup', %s, %s)
+                    """,
+                    (user["id"], token_hash, expires),
+                )
+                enqueue_email(
+                    cur,
+                    user_id=user["id"],
+                    kind="signup_verification",
+                    to_email=user["email"],
                     subject="Verify your email",
                     body=f"Click to verify: {link}",
                 )
@@ -182,6 +288,46 @@ async def signup(request:Request, payload: SignupIn):
             detail="The email address or username already exists",
         )
     return {"ok": True, "message": "Please check and verify your email address."}
+
+
+@router.post("/verification/resend")
+def resend_verification(
+    request: Request,
+    payload: VerificationResendIn,
+):
+    identifier = payload.login.strip().lower()
+    try:
+        assert_rate_limit(
+            scope="verification_resend_identifier",
+            key=identifier,
+            max_events=VERIFICATION_RESEND_IDENTIFIER_MAX,
+            window_seconds=VERIFICATION_RESEND_RATE_WINDOW_SECONDS,
+        )
+        assert_rate_limit(
+            scope="verification_resend_ip",
+            key=get_client_ip(request),
+            max_events=VERIFICATION_RESEND_IP_MAX,
+            window_seconds=VERIFICATION_RESEND_RATE_WINDOW_SECONDS,
+        )
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.warning(
+            "Operational failure: operation=verification_resend "
+            "stage=rate_limit error=%s",
+            type(exc).__name__,
+        )
+        return VERIFICATION_RESEND_RESPONSE
+
+    try:
+        _queue_verification_resend(identifier)
+    except Exception as exc:
+        logger.warning(
+            "Operational failure: operation=verification_resend "
+            "stage=queue error=%s",
+            type(exc).__name__,
+        )
+    return VERIFICATION_RESEND_RESPONSE
 
 
 @router.get("/verify-email", response_class=HTMLResponse)
