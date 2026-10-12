@@ -273,6 +273,51 @@ class ThoughtDeliveryUxTests(unittest.TestCase):
                 public.get_public_thought(thought_id)
             self.assertEqual(raised.exception.status_code, 404)
 
+    def test_legacy_publication_migration_preserves_strings_and_account(self):
+        thought_id = self.insert_thought(None)
+        migration = "013_preserve_legacy_publication.sql"
+
+        con = connect()
+        try:
+            with con.transaction():
+                with con.cursor() as cur:
+                    cur.execute(
+                        "UPDATE thoughts SET published_at = NULL WHERE id = %s",
+                        (thought_id,),
+                    )
+                    cur.execute(
+                        "DELETE FROM schema_migrations WHERE version = %s",
+                        (migration,),
+                    )
+        finally:
+            con.close()
+
+        run_migrations()
+
+        con = connect()
+        try:
+            with con.cursor() as cur:
+                cur.execute(
+                    "SELECT published_at FROM thoughts WHERE id = %s",
+                    (thought_id,),
+                )
+                thought = cur.fetchone()
+                cur.execute(
+                    "SELECT id FROM users WHERE id = %s",
+                    (self.user_id,),
+                )
+                account = cur.fetchone()
+        finally:
+            con.close()
+
+        self.assertIsNotNone(thought["published_at"])
+        self.assertEqual(account["id"], self.user_id)
+        public_ids = {
+            row["id"]
+            for row in public.public_thoughts_by_user(self.user_id)["items"]
+        }
+        self.assertIn(thought_id, public_ids)
+
 
 if __name__ == "__main__":
     unittest.main()
